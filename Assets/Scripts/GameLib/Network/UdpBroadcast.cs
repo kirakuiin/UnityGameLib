@@ -3,9 +3,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using GameLib.Network.Base;
+using GameLib.Common;
 
-namespace GameLib.Network.Broadcast
+namespace GameLib.Network
 {
     /// <summary>
     /// 提供广播发送功能
@@ -57,7 +57,7 @@ namespace GameLib.Network.Broadcast
         /// <returns>发送的字节数。</returns>
         public int Broadcast(string message)
         {
-            byte[] data = Encoding.UTF8.GetBytes(message);
+            var data = Encoding.UTF8.GetBytes(message);
             return _udpSender.Send(data, data.Length, _endPoint);
         }
     }
@@ -127,7 +127,7 @@ namespace GameLib.Network.Broadcast
             while (IsSending)
             {
                 _sender.Broadcast();
-                await Task.Delay((int)(BroadcastInterval*(int)TimeScalar.MillsecondsPerSecond));
+                await Task.Delay((int)(BroadcastInterval*(int)TimeScalar.MillisecondsPerSecond));
             }
         }
 

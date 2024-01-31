@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
-using GameLib.Network.Base;
+using GameLib.Common;
 
 namespace GameLib.Network.Analysis
 {
@@ -11,29 +11,29 @@ namespace GameLib.Network.Analysis
     public class Latency
     {
 
-        private Ping _sender = new Ping();
+        private readonly Ping _sender = new Ping();
 
-        private int _timeout;
+        private readonly int _timeout;
 
         /// <value>
         /// 获得目标主机IP地址
         /// </value>
-        public string _targetAddress = Address.GetLocalIPAddress().ToString();
+        private readonly string _targetAddress;
 
         /// <summary>
         /// 默认探测超时时间(s)
         /// </summary>
-        public const int DEFAULT_TIMEOUT = 10;
+        private const int DefaultTimeout = 10;
 
         /// <summary>
         /// 以IP/host地址字符串和超时时间构造对象。
         /// </summary>
         /// <param name="targetIP"></param>
         /// <param name="timeout"></param>
-        public Latency(string targetIP, int timeout=DEFAULT_TIMEOUT)
+        public Latency(string targetIP, int timeout=DefaultTimeout)
         {
             _targetAddress = targetIP;
-            _timeout = timeout;
+            this._timeout = timeout;
         }
 
         /// <summary>
@@ -42,14 +42,14 @@ namespace GameLib.Network.Analysis
         /// <returns><c>Task&lt;NetworkStatus&gt;</c></returns>
         public async Task<NetworkStatus> GetLatencyAsync()
         {
-           var reply = await _sender.SendPingAsync(_targetAddress, TimeScalar.SecondToMs(_timeout));
+           var reply = await _sender.SendPingAsync(_targetAddress, TimeScalar.ConvertSecondToMs(_timeout));
            return new NetworkStatus(reply);
         }
 
         /// <summary>
         /// 网络状况结果
         /// </summary>
-        public struct NetworkStatus
+        public readonly struct NetworkStatus
         {
             public NetworkStatus(PingReply reply)
             {
@@ -60,15 +60,15 @@ namespace GameLib.Network.Analysis
             /// <summary>
             /// 目标主机IP
             /// </summary>
-            public IPAddress TargetIP;
+            public readonly IPAddress TargetIP;
             /// <summary>
             /// 网络状态
             /// </summary>
-            public IPStatus Status;
+            public readonly IPStatus Status;
             /// <summary>
             /// 延迟(ms)
             /// </summary>
-            public long Latency;
+            public readonly long Latency;
 
             public override string ToString()
             {

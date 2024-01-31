@@ -1,24 +1,24 @@
-namespace GameLib
+namespace GameLib.Common
 {
     public static class TimeScalar
     {
         /// <summary>
         /// 每秒包含多少毫秒
         /// </summary>
-        public const int MillsecondsPerSecond = 1000;
+        public const int MillisecondsPerSecond = 1000;
 
         /// <summary>
         /// 将秒转为毫秒
         /// </summary>
         /// <param name="seconds"></param>
         /// <returns>毫秒</returns>
-        public static int SecondToMs(float seconds) => (int)(seconds*MillsecondsPerSecond);
-
+        public static int ConvertSecondToMs(float seconds) => (int)(seconds*MillisecondsPerSecond);
+        
         /// <summary>
         /// 将秒转为毫秒
         /// </summary>
         /// <param name="seconds"></param>
         /// <returns>毫秒</returns>
-        public static int SecondToMs(int seconds) => seconds*MillsecondsPerSecond;
+        public static int ConvertSecondToMs(int seconds) => seconds*MillisecondsPerSecond;
     }
 }

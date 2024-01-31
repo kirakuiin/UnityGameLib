@@ -1,6 +1,7 @@
 using System.Net;
 
-namespace GameLib.Network.Base {
+namespace GameLib.Network
+{
 
     /// <summary>
     /// 提供若干和网络地址相关函数的静态类。
@@ -18,8 +19,8 @@ namespace GameLib.Network.Base {
         /// <returns><c>IPAddress</c>代表本机的IP地址</returns>
         public static IPAddress GetLocalIPAddress()
         {
-            var IPAddressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
-            return IPAddressList[^1];
+            var ipAddressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+            return ipAddressList[^1];
         }
 
         /// <summary>
