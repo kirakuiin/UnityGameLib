@@ -1,7 +1,5 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using GameLib.Common;
-using NUnit.Framework.Internal;
 
 namespace UnitTest.Editor
 {
@@ -25,7 +23,7 @@ namespace UnitTest.Editor
         {
             if (TestSingleton.Instance.Name != TestSingleton.DefaultName)
             {
-                throw new UnitTextException("单例初始化错误");
+                throw new UnitTestException("单例初始化错误");
             }
         }
 
@@ -42,6 +40,15 @@ namespace UnitTest.Editor
         {
             TestSingleton.Instance.Name = "hello";
             TestSingleton.Destroy();
+        }
+
+        [Test]
+        public void TestIsInitialized()
+        {
+            if (!TestSingleton.Instance.IsInitialized())
+            {
+                throw new UnitTestException("单例未初始化");
+            }
         }
     }
 }

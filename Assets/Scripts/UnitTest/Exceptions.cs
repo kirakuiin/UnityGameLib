@@ -2,8 +2,8 @@
 
 namespace UnitTest
 {
-    public class UnitTextException : Exception
+    public class UnitTestException : Exception
     {
-        public UnitTextException(string msg) : base(msg) {}
+        public UnitTestException(string msg) : base(msg) {}
     }
 }
