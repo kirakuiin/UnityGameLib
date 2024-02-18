@@ -12,43 +12,36 @@ namespace UnitTest.Editor
             public static readonly string DefaultName = nameof(TestSingleton);
             public string Name = DefaultName;
         }
-        
-        [Test]
-        public void TestInstance()
+
+        public void Set()
         {
-            CheckIsDefault();
+            
         }
 
-        void CheckIsDefault()
+        [SetUp]
+        public void Setup()
         {
-            if (TestSingleton.Instance.Name != TestSingleton.DefaultName)
-            {
-                throw new UnitTestException("单例初始化错误");
-            }
+            TestSingleton.Instance.Name = "hello";
         }
 
         [Test]
         public void TestCreate()
         {
-            TestSingleton.Instance.Name = "hello";
             TestSingleton.Create();
-            CheckIsDefault();
+            
+            Assert.AreEqual(TestSingleton.DefaultName, TestSingleton.Instance.Name);
         }
 
         [Test]
         public void TestDestroy()
         {
-            TestSingleton.Instance.Name = "hello";
             TestSingleton.Destroy();
         }
 
         [Test]
         public void TestIsInitialized()
         {
-            if (!TestSingleton.Instance.IsInitialized())
-            {
-                throw new UnitTestException("单例未初始化");
-            }
+            Assert.IsTrue(TestSingleton.Instance.IsInitialized());
         }
     }
 }

@@ -11,11 +11,19 @@ namespace UnitTest.Editor
         private readonly BroadcastListener _receiver = new BroadcastListener();
         private const string Message = "hello world!";
 
-        public BroadcastUnitTest()
+        [OneTimeSetUp]
+        public void OneTimeSetup()
         {
             _receiver.StartListen();
             _receiver.OnReceivedBroadcast += OnReceivedBroadcast;
             _sender.StartBroadcast(Message);
+        }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            _receiver.StartListen();
+            _sender.StopBroadcast();
         }
 
         void OnReceivedBroadcast(IPAddress addr, string msg)
@@ -23,21 +31,16 @@ namespace UnitTest.Editor
         }
 
         [Test]
+        [Timeout(100)]
         public void TestIsSending()
         {
-            if (_sender.IsSending == false)
-            {
-                throw new UnitTestException("广播未启动！");
-            }
+            Assert.IsFalse(_sender.IsSending == false);
         }
         
         [Test]
         public void TestIsListening()
         {
-            if (_receiver.IsListening == false)
-            {
-                throw new UnitTestException("监听未启动！");
-            }
+            Assert.IsFalse(_receiver.IsListening == false);
         }
 
         [Test]
@@ -45,10 +48,7 @@ namespace UnitTest.Editor
         {
             _receiver.StopListen();
             
-            if (_receiver.IsListening == true)
-            {
-                throw new UnitTestException("监听未关闭！");
-            }
+            Assert.IsFalse(_receiver.IsListening);
         }
         
         [Test]
@@ -56,10 +56,7 @@ namespace UnitTest.Editor
         {
             _sender.StopBroadcast();
             
-            if (_sender.IsSending == true)
-            {
-                throw new UnitTestException("广播未关闭！");
-            }
+            Assert.IsFalse(_sender.IsSending);
         }
     }
 }
