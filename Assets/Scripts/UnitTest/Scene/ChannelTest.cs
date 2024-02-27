@@ -6,6 +6,9 @@ using Unity.Netcode;
 
 namespace UnitTest.Scene 
 {
+    /// <summary>
+    /// 测试<c>NetworkedMessageChannel</c>
+    /// </summary>
     public class ChannelTest : MonoBehaviour
     {
         private NetworkedMessageChannel<TestMessage> _channel;

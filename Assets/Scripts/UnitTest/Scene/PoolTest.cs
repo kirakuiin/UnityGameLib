@@ -7,6 +7,9 @@ using GameLib.Common.Extension;
 
 namespace UnitTest.Scene 
 {
+    /// <summary>
+    /// 测试<c>NetworkObjectPool</c>
+    /// </summary>
     public class PoolTest : MonoBehaviour
     {
         [SerializeField] private GameObject cubePrefab;
