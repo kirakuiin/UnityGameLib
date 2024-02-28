@@ -1,9 +1,7 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using GameLib.Common;
 using UnityEngine;
 using TMPro;
-using UnityEngine.Serialization;
 
 namespace UnitTest.Scene
 {
