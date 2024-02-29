@@ -3,19 +3,30 @@
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement
 {
-    public class OnlineState : ConnectionState
+    /// <summary>
+    /// 表达在线状态的抽象类。
+    /// </summary>
+    public abstract class OnlineState : ConnectionState
     {
-        public OnlineState(ConnectionManager manager, IPublisher<ConnectStatus> publisher)
-            : base(manager, publisher)
+        protected readonly ConnectionManager Manager;
+
+        protected readonly IPublisher<ConnectStatus> Publisher;
+        
+        protected OnlineState(ConnectionManager manager, IPublisher<ConnectStatus> publisher)
         {
+            Manager = manager;
+            Publisher = publisher;
         }
 
-        public override void Enter()
+        public override void OnUserRequestShutdown()
         {
+            Publisher.Publish(ConnectStatus.UserRequestedDisconnect);
+            Manager.ChangeState<OfflineState>();
         }
 
-        public override void Exit()
+        public override void OnTransportFailure()
         {
+            Manager.ChangeState<OfflineState>();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using GameLib.Network.NGO.Channel;
 using Unity.Netcode;
 
 // ReSharper disable once CheckNamespace
@@ -10,16 +9,6 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public abstract class ConnectionState
     {
-        protected IPublisher<ConnectStatus> Publisher;
-
-        protected ConnectionManager Manager;
-
-        protected ConnectionState(ConnectionManager manager, IPublisher<ConnectStatus> publisher)
-        {
-            Manager = manager;
-            Publisher = publisher;
-        }
-
         /// <summary>
         /// 处理进入状态前的准备工作。
         /// </summary>
@@ -29,6 +18,13 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// 处理离开状态前的清理操作。
         /// </summary>
         public abstract void Exit();
+
+        /// <summary>
+        /// 获得状态的名称。
+        /// </summary>
+        /// <remarks>如果想要替换某个非抽象类的功能，那么不应该重写此函数，要保持同继承树内名称相同。</remarks>
+        /// <returns>字符串</returns>
+        public abstract string GetStateType();
         
         /// <summary>
         /// 处理客户端连接时的工作。

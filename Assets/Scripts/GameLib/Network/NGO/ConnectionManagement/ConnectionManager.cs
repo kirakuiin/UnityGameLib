@@ -17,12 +17,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// <typeparam name="T">状态的类型</typeparam>
         public void AddState<T>(T state) where T : ConnectionState
         {
-            _statesInfo[GetTypeName<T>()] = state;
-        }
-
-        private string GetTypeName<T>()
-        {
-            return typeof(T).Name;
+            _statesInfo[state.GetStateType()] = state;
         }
 
         /// <summary>
@@ -37,6 +32,11 @@ namespace GameLib.Network.NGO.ConnectionManagement
             _currentState = GetState<T>();
             _currentState.Enter();
         }
+        
+        private string GetTypeName<T>()
+        {
+            return typeof(T).Name;
+        }
 
         private ConnectionState GetState<T>()
         {
@@ -46,16 +46,6 @@ namespace GameLib.Network.NGO.ConnectionManagement
                 return state;
             }
             throw new NotExistConnectionStateException(key);
-        }
-    }
-
-    /// <summary>
-    /// 表示某个连接状态不存在的异常。
-    /// </summary>
-    internal class NotExistConnectionStateException : LibException
-    {
-        public NotExistConnectionStateException(string stateType) : base($"State: {stateType} not exist!")
-        {
         }
     }
 }
