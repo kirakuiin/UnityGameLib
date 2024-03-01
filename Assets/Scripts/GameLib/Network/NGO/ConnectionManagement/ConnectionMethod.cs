@@ -46,6 +46,13 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public abstract class ConnectionMethod
     {
+        protected readonly string PlayerID;
+        
+        protected ConnectionMethod(string playerID)
+        {
+            PlayerID = playerID;
+        }
+        
         /// <summary>
         /// 异步地设置主机端的连接。
         /// </summary>
@@ -70,20 +77,32 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// 设置连接时携带的数据。
         /// </summary>
         /// <param name="playerID">玩家ID</param>
-        protected virtual void SetConnectionPayload(string playerID)
+        protected virtual void SetConnectionPayload()
         {
             var payload = new ConnectionPayload()
             {
-                playerID = playerID,
+                playerID = PlayerID,
                 isDebug = Debug.isDebugBuild,
             };
             NetworkManager.Singleton.NetworkConfig.ConnectionData = CreatePayload(payload);
         }
         
-        protected byte[] CreatePayload<T>(T obj) where T : struct
+        private byte[] CreatePayload<T>(T obj) where T : struct
         {
             var payloadStr = JsonUtility.ToJson(obj);
             return System.Text.Encoding.UTF8.GetBytes(payloadStr);
+        }
+
+        /// <summary>
+        /// 将结构体从字节流中解压出来。
+        /// </summary>
+        /// <param name="payload">字节流</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>结构体对象</returns>
+        public static T DumpPayload<T>(byte[] payload) where T : struct
+        {
+            var payloadStr = System.Text.Encoding.UTF8.GetString(payload);
+            return JsonUtility.FromJson<T>(payloadStr);
         }
         
     }
@@ -98,6 +117,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
         private readonly ushort _port;
 
         public DirectIPConnectionMethod(IPAddress ip, ushort port)
+        : base(PlayerGuid.GetGuidByMachine())
         {
             _ip = ip;
             _port = port;
@@ -110,7 +130,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
 
         private void CommonSetup()
         {
-            SetConnectionPayload(PlayerGuid.GetGuidByMachine());
+            SetConnectionPayload();
             var utp = (UnityTransport)NetworkManager.Singleton.NetworkConfig.NetworkTransport;
             utp.SetConnectionData(_ip.ToString(), _port);
         }

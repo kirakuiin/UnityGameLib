@@ -15,5 +15,14 @@ namespace GameLib.Common
                 Debug.LogError(msg);
             }
         }
+
+        protected LibException(string msg, Exception inner, bool isLogInUnity = true) : base(msg, inner)
+        {
+            if (isLogInUnity)
+            {
+                Debug.LogError(msg);
+                Debug.LogError(inner.ToString());
+            }
+        }
     }
 }

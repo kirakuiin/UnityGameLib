@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using GameLib.Common;
+using GameLib.Network.NGO.Channel;
 using Unity.Netcode;
 
 // ReSharper disable once CheckNamespace
@@ -9,6 +11,12 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public abstract class ConnectionState
     {
+        protected IPublisher<ConnectStatus> Publisher = ServiceLocator.Instance.Get<IPublisher<ConnectStatus>>();
+
+        protected ConnectionManager ConnManager = ConnectionManager.Instance;
+
+        protected NetworkManager NetManager = NetworkManager.Singleton;
+
         /// <summary>
         /// 处理进入状态前的准备工作。
         /// </summary>

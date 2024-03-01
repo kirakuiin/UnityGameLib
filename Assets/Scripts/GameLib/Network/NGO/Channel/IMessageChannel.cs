@@ -1,4 +1,5 @@
 ﻿using System;
+using GameLib.Common;
 
 namespace GameLib.Network.NGO.Channel
 {
@@ -6,7 +7,7 @@ namespace GameLib.Network.NGO.Channel
     /// 发布者接口，实现此接口具有发布消息功能
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IPublisher<in T>
+    public interface IPublisher<in T> : IGameService
     {
         /// <summary>
         /// 发布消息

@@ -1,6 +1,4 @@
-﻿using GameLib.Network.NGO.Channel;
-
-// ReSharper disable once CheckNamespace
+﻿// ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement
 {
     /// <summary>
@@ -8,25 +6,15 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public abstract class OnlineState : ConnectionState
     {
-        protected readonly ConnectionManager Manager;
-
-        protected readonly IPublisher<ConnectStatus> Publisher;
-        
-        protected OnlineState(ConnectionManager manager, IPublisher<ConnectStatus> publisher)
-        {
-            Manager = manager;
-            Publisher = publisher;
-        }
-
         public override void OnUserRequestShutdown()
         {
             Publisher.Publish(ConnectStatus.UserRequestedDisconnect);
-            Manager.ChangeState<OfflineState>();
+            ConnManager.ChangeState<OfflineState>();
         }
 
         public override void OnTransportFailure()
         {
-            Manager.ChangeState<OfflineState>();
+            ConnManager.ChangeState<OfflineState>();
         }
     }
 }

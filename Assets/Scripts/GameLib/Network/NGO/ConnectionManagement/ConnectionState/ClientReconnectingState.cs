@@ -1,4 +1,8 @@
-﻿using GameLib.Network.NGO.Channel;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement
@@ -11,18 +15,144 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public class ClientReconnectingState : ClientConnectingState
     {
-        public ClientReconnectingState(ConnectionManager manager, IPublisher<ConnectStatus> publisher) : base(manager, publisher)
+        private Coroutine _reconnectCoroutine;
+
+        private int _currentAttemptNum;
+
+        private const int TimeBeforeFirstAttempt = 1;
+
+        private const int TimeBetweenAttempts = 5;
+
+        private readonly List<ConnectStatus> _offlineStateList = new()
+        {
+            ConnectStatus.ServerFull,
+            ConnectStatus.HostEndSession,
+            ConnectStatus.IncompatibleBuildType,
+            ConnectStatus.UserRequestedDisconnect,
+        };
+        
+        protected ClientReconnectingState(ConnectionMethod method) : base(method)
         {
         }
         
         public override void Enter()
         {
-            throw new System.NotImplementedException();
+            _currentAttemptNum = 0;
+            _reconnectCoroutine = ConnManager.StartCoroutine(ReconnectCoroutine());
+        }
+
+        private IEnumerator ReconnectCoroutine()
+        {
+            if (_currentAttemptNum > 0) yield return WaitForBetween();
+            
+            yield return WaitForShutdown();
+
+            yield return WaitForReconnect();
+        }
+
+        private IEnumerator WaitForBetween()
+        {
+            yield return new WaitForSeconds(TimeBetweenAttempts);
+        }
+
+        private IEnumerator WaitForShutdown()
+        {
+            Debug.Log($"丢失和主机端的链接，开始进行重连...");
+            NetManager.Shutdown();
+            yield return new WaitWhile(() => NetManager.ShutdownInProgress);
+        }
+
+        private IEnumerator WaitForReconnect()
+        {
+            // 第一次断开重连时，留出足够的时间给服务更新状态。
+            if (_currentAttemptNum == 0) yield return new WaitForSeconds(TimeBeforeFirstAttempt);
+            
+            _currentAttemptNum++;
+            var reconnectSetupTask = ConnMethod.SetupClientReconnectAsync();
+            yield return new WaitUntil(() => reconnectSetupTask.IsCompleted);
+
+            yield return StartReconnect(reconnectSetupTask);
+        }
+
+        private IEnumerator StartReconnect(Task<ReconnectResult> reconnectTask)
+        {
+            if (!reconnectTask.IsFaulted && reconnectTask.Result.IsSuccess)
+            {
+                var connectingTask = ConnectAsync();
+                yield return new WaitUntil(() => connectingTask.IsCompleted);
+            }
+            else
+            {
+                if (!reconnectTask.Result.ShouldTryAgain)
+                {
+                    _currentAttemptNum = ConnManager.config.maxConnectedPlayerNum;
+                }
+                OnClientDisconnected(0);
+            }
+        }
+
+        public override void OnClientDisconnected(ulong clientID)
+        {
+            if (_currentAttemptNum < ConnManager.config.maxConnectedPlayerNum)
+            {
+                ContinueReconnect();
+            }
+            else
+            {
+                HandleByDisconnectReason(
+                    nullAction: () => Publisher.Publish(ConnectStatus.GenericDisconnect),
+                    statusAction: status => Publisher.Publish(status)
+                );
+                ConnManager.ChangeState<OfflineState>();
+            }
+        }
+
+        private void ContinueReconnect()
+        {
+            HandleByDisconnectReason(
+                nullAction: () => _reconnectCoroutine = ConnManager.StartCoroutine(ReconnectCoroutine()),
+                statusAction: ChangeStateByStatus
+            );
+        }
+
+        private void HandleByDisconnectReason(Action nullAction, Action<ConnectStatus> statusAction)
+        {
+            var disconnectReason = NetManager.DisconnectReason;
+            if (string.IsNullOrEmpty(disconnectReason))
+            {
+                nullAction();
+            }
+            else
+            {
+                statusAction(GetStatusFromManager());
+            }
+        }
+
+        private ConnectStatus GetStatusFromManager()
+        {
+            return JsonUtility.FromJson<ConnectStatus>(NetManager.DisconnectReason);
+        }
+
+        private void ChangeStateByStatus(ConnectStatus status)
+        {
+            Publisher.Publish(status);
+            if (_offlineStateList.Contains(status))
+            {
+                ConnManager.ChangeState<OfflineState>();
+            }
+            else
+            {
+                _reconnectCoroutine = ConnManager.StartCoroutine(ReconnectCoroutine());
+            }
         }
 
         public override void Exit()
         {
-            throw new System.NotImplementedException();
+            if (_reconnectCoroutine != null)
+            {
+                ConnManager.StopCoroutine(_reconnectCoroutine);
+                _reconnectCoroutine = null;
+            }
         }
 
         public override string GetStateType()

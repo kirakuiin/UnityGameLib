@@ -38,19 +38,19 @@
         Reconnecting,
         
         /// <summary>
-        /// 服务端和客户端的版本不一致。
+        /// 服务端和客户端的构建版本不一致。
         /// </summary>
-        IncompatibleVersionType,
+        IncompatibleBuildType,
         
         /// <summary>
-        /// 服务端主动终止连接。
+        /// 主机端主动终止连接。
         /// </summary>
-        ServerEndSession,
+        HostEndSession,
         
         /// <summary>
-        /// 服务端启动失败。
+        /// 主机端启动失败。
         /// </summary>
-        StartServerFailed,
+        StartHostFailed,
         
         /// <summary>
         /// 客户端启动失败，可能是连接服务器失败或是提供的ip信息错误。

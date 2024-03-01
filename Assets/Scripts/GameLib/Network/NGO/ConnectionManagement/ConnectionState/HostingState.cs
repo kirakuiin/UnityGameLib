@@ -1,4 +1,5 @@
-﻿using GameLib.Network.NGO.Channel;
+﻿using Unity.Netcode;
+using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement
@@ -9,10 +10,8 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public class HostingState : OnlineState
     {
-        public HostingState(ConnectionManager manager, IPublisher<ConnectStatus> publisher) : base(manager, publisher)
-        {
-        }
-
+        private const int MaxPayloadLength = 1024;
+        
         public override void Enter()
         {
         }
@@ -24,6 +23,76 @@ namespace GameLib.Network.NGO.ConnectionManagement
         public override string GetStateType()
         {
             return nameof(HostingState);
+        }
+
+        public override void OnUserRequestShutdown()
+        {
+            var reason = JsonUtility.ToJson(ConnectStatus.HostEndSession);
+            foreach (var clientID in NetManager.ConnectedClientsIds)
+            {
+                if (clientID != NetManager.LocalClientId)
+                {
+                    NetManager.DisconnectClient(clientID, reason);
+                }
+            }
+            base.OnUserRequestShutdown();
+        }
+
+        public override void OnServerStopped()
+        {
+            Publisher.Publish(ConnectStatus.GenericDisconnect);
+            ConnManager.ChangeState<OfflineState>();
+        }
+
+        public override void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        {
+            if (IsDosAttack(request)) return;
+            SetResponse(request, response);
+        }
+
+        private bool IsDosAttack(NetworkManager.ConnectionApprovalRequest request)
+        {
+            return request.Payload.Length > MaxPayloadLength;
+        }
+
+        /// <summary>
+        /// 设置连接认证的回复数据。
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="response"></param>
+        protected void SetResponse(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        {
+            var status = GetConnectStatus(request);
+            if (status == ConnectStatus.Success)
+            {
+                response.Approved = true;
+                response.CreatePlayerObject = false;
+            }
+            else
+            {
+                response.Approved = false;
+                response.Reason = JsonUtility.ToJson(status);
+            }
+        }
+
+        /// <summary>
+        /// 获得当前的连接状态。
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        protected ConnectStatus GetConnectStatus(NetworkManager.ConnectionApprovalRequest request)
+        {
+            var payload = ConnectionMethod.DumpPayload<ConnectionPayload>(request.Payload);
+            if (NetManager.ConnectedClientsIds.Count >= ConnManager.config.maxConnectedPlayerNum)
+            {
+                return ConnectStatus.ServerFull;
+            }
+            if (payload.isDebug != Debug.isDebugBuild)
+            {
+                return ConnectStatus.IncompatibleBuildType;
+            }
+            
+            return ConnectStatus.Success;
         }
     }
 }

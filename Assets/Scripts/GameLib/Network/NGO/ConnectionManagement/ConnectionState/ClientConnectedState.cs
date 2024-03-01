@@ -1,4 +1,4 @@
-﻿using GameLib.Network.NGO.Channel;
+﻿using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement
@@ -10,18 +10,28 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public class ClientConnectedState : OnlineState
     {
-        public ClientConnectedState(ConnectionManager manager, IPublisher<ConnectStatus> publisher) : base(manager, publisher)
-        {
-        }
-
         public override void Enter()
         {
-            throw new System.NotImplementedException();
         }
 
         public override void Exit()
         {
-            throw new System.NotImplementedException();
+        }
+
+        public override void OnClientDisconnected(ulong clientID)
+        {
+            var disconnectReason = NetManager.DisconnectReason;
+            if (string.IsNullOrEmpty(disconnectReason))
+            {
+                Publisher.Publish(ConnectStatus.Reconnecting);
+                ConnManager.ChangeState<ClientReconnectingState>();
+            }
+            else
+            {
+                var connectStatus = JsonUtility.FromJson<ConnectStatus>(disconnectReason);
+                Publisher.Publish(connectStatus);
+                ConnManager.ChangeState<OfflineState>();
+            }
         }
 
         public override string GetStateType()

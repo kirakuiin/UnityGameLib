@@ -1,4 +1,6 @@
-﻿using GameLib.Network.NGO.Channel;
+﻿using System;
+using System.Threading.Tasks;
+using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement
@@ -9,18 +11,66 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public class ClientConnectingState : OnlineState
     {
-        public ClientConnectingState(ConnectionManager manager, IPublisher<ConnectStatus> publisher) : base(manager, publisher)
-        {
-        }
+        protected readonly ConnectionMethod ConnMethod;
 
+        protected ClientConnectingState(ConnectionMethod method)
+        {
+            ConnMethod = method;
+        }
+        
         public override void Enter()
         {
-            throw new System.NotImplementedException();
+#pragma warning disable CS4014 // 由于此调用不会等待，因此在调用完成前将继续执行当前方法
+            ConnectAsync();
+#pragma warning restore CS4014 // 由于此调用不会等待，因此在调用完成前将继续执行当前方法
         }
 
+        protected async Task ConnectAsync()
+        {
+            try
+            {
+                await ConnMethod.SetupClientConnectionAsync();
+
+                if (!NetManager.StartClient())
+                {
+                    throw new Exception("启动客户端失败！");
+                }
+            }
+            catch (Exception e)
+            {
+                ConnectFailed();
+                throw new CommonConnectionException(e);
+            }
+        }
+
+        private void ConnectFailed()
+        {
+            var disconnectReason = NetManager.DisconnectReason;
+            if (string.IsNullOrEmpty(disconnectReason))
+            {
+                Publisher.Publish(ConnectStatus.StartClientFailed);
+            }
+            else
+            {
+                var connectStatus = JsonUtility.FromJson<ConnectStatus>(disconnectReason);
+                Publisher.Publish(connectStatus);
+            }
+            ConnManager.ChangeState<OfflineState>();
+        }
+
+        public override void OnClientConnected(ulong clientID)
+        {
+            Publisher.Publish(ConnectStatus.Success);
+            ConnManager.ChangeState<ClientConnectedState>();
+        }
+
+        public override void OnClientDisconnected(ulong clientID)
+        {
+            ConnectFailed();
+        }
+        
         public override void Exit()
         {
-            throw new System.NotImplementedException();
         }
 
         public override string GetStateType()
