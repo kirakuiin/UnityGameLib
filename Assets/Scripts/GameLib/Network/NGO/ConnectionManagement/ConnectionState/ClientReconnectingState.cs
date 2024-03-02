@@ -71,6 +71,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
             var reconnectSetupTask = ConnMethod.SetupClientReconnectAsync();
             yield return new WaitUntil(() => reconnectSetupTask.IsCompleted);
 
+            Debug.Log($"重连 {_currentAttemptNum}/{ConnManager.config.reconnectAttemptNum}");
             yield return StartReconnect(reconnectSetupTask);
         }
 
@@ -153,11 +154,6 @@ namespace GameLib.Network.NGO.ConnectionManagement
                 ConnManager.StopCoroutine(_reconnectCoroutine);
                 _reconnectCoroutine = null;
             }
-        }
-
-        public override string GetStateType()
-        {
-            return nameof(ClientReconnectingState);
         }
     }
 }

@@ -18,14 +18,14 @@ namespace GameLib.Network.NGO.ConnectionManagement
         {
         }
 
-        public override string GetStateType()
+        public override void StartClient(IPEndPoint endPoint)
         {
-            return nameof(OfflineState);
+            ConnManager.ChangeState<ClientConnectingState>();
         }
 
-        public override void StartClient(IPAddress ipAddress, int port)
+        public override void StartHost()
         {
-            base.StartClient(ipAddress, port);
+            ConnManager.ChangeState<StartHostingState>();
         }
     }
 }

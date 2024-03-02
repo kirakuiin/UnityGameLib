@@ -33,7 +33,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
         
         private ConnectionState _currentState;
 
-        private Dictionary<string, ConnectionState> _statesInfo;
+        private readonly Dictionary<string, ConnectionState> _statesInfo = new();
 
         private void Start()
         {
@@ -47,37 +47,44 @@ namespace GameLib.Network.NGO.ConnectionManagement
 
         private void OnClientConnected(ulong clientID)
         {
+            Debug.Log($"客户端{clientID}连接。");
             _currentState.OnClientConnected(clientID);
         }
 
         private void OnClientDisconnect(ulong clientID)
         {
+            Debug.Log($"客户端{clientID}断开连接。");
             _currentState.OnClientDisconnected(clientID);
         }
 
         private void OnServerStarted()
         {
+            Debug.Log("服务端启动。");
             _currentState.OnServerStarted();
         }
 
         private void OnServerStopped(bool isHost)
         {
+            Debug.Log($"{(isHost ? "主机端" : "服务端")}关闭。");
             _currentState.OnServerStopped();
         }
 
         private void OnApproveCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
+            Debug.Log($"客户端{request.ClientNetworkId}进行认证。");
             _currentState.ApprovalCheck(request, response);
         }
 
         private void OnTransportFailure()
         {
+            Debug.LogWarning($"传输失败。");
             _currentState.OnTransportFailure();
         }
 
 
         private void OnDestroy()
         {
+            if (NetworkManager.Singleton is null) return;
             NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
             NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
@@ -89,16 +96,22 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// <summary>
         /// 新增一个状态(用以被转换)。
         /// </summary>
-        /// <remarks>其他接口必须要状态添加完毕之后再进行调用。</remarks>
+        /// <remarks>1. 如果T和实例类型不一致，调用时最好显式设置<c>T</c>来指定代表的状态类型。</remarks>
+        /// <remarks>2. 其他接口必须要状态添加完毕之后再进行调用。</remarks>
         /// <param name="state">状态对象</param>
         /// <typeparam name="T">状态的类型</typeparam>
         public void AddState<T>(T state) where T : ConnectionState
         {
-            _statesInfo[state.GetStateType()] = state;
+            _statesInfo[GetTypeName<T>()] = state;
             if (state is OfflineState)
             {
                 _currentState = state;
             }
+        }
+        
+        private string GetTypeName<T>()
+        {
+            return typeof(T).Name;
         }
 
         /// <summary>
@@ -107,20 +120,14 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// <typeparam name="T">状态的类型</typeparam>
         public void ChangeState<T>()
         {
-            if (_currentState.GetStateType() == GetTypeName<T>()) return;
-            
-            Debug.Log($"From {nameof(_currentState)} to {GetTypeName<T>()}");
+            Debug.Log($"状态转换：{_currentState?.GetType().Name} => {typeof(T).Name}");
+            if (_currentState != null && _currentState.Equals(GetState<T>())) return;
             
             _currentState?.Exit();
             _currentState = GetState<T>();
             _currentState.Enter();
         }
         
-        private string GetTypeName<T>()
-        {
-            return typeof(T).Name;
-        }
-
         private ConnectionState GetState<T>()
         {
             var key = GetTypeName<T>();
@@ -142,9 +149,8 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// <summary>
         /// 启动主机。
         /// </summary>
-        /// <param name="address">服务端IP地址</param>
-        /// <param name="port">服务端端口号</param>
-        public void StartHost(IPAddress address, ushort port)
+        /// <param name="endPoint">服务端的地址</param>
+        public void StartHost(IPEndPoint endPoint)
         {
             _currentState.StartHost();
         }
@@ -152,11 +158,10 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// <summary>
         /// 启动客户端。
         /// </summary>
-        /// <param name="address">服务端IP地址</param>
-        /// <param name="port">服务端端口号</param>
-        public void StartClient(IPAddress address, ushort port)
+        /// <param name="endPoint">服务端的地址</param>
+        public void StartClient(IPEndPoint endPoint)
         {
-            _currentState.StartClient(address, port);
+            _currentState.StartClient(endPoint);
         }
     }
 }

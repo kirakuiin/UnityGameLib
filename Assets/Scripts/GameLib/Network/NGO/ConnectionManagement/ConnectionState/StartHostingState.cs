@@ -1,5 +1,6 @@
 ﻿using Unity.Netcode;
 using System;
+using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement
@@ -72,7 +73,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
             NetworkManager.ConnectionApprovalResponse response)
         {
                 response.Approved = true;
-                response.CreatePlayerObject = false;
+                response.CreatePlayerObject = true;
         }
 
         public override void OnServerStopped()
@@ -82,11 +83,6 @@ namespace GameLib.Network.NGO.ConnectionManagement
 
         public override void Exit()
         {
-        }
-
-        public override string GetStateType()
-        {
-            return nameof(StartHostingState);
         }
     }
 }

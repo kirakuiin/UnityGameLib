@@ -20,7 +20,7 @@ namespace GameLib.Network.NGO.Channel
     /// 订阅者接口，实现此接口具有订阅功能
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface ISubscriber<out T>
+    public interface ISubscriber<out T> : IGameService
     {
         /// <summary>
         /// 使用处理函数订阅此接口

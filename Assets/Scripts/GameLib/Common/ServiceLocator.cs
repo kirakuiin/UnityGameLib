@@ -26,12 +26,21 @@ namespace GameLib.Common
         public T Get<T>() where T : IGameService
         {
             var key = GetTypeName<T>();
-            if (!_services.ContainsKey(key))
+            if (_services.TryGetValue(key, out var service)) return (T)service;
+            return GetAtAll<T>();
+        }
+        
+        private T GetAtAll<T>()
+        {
+            var key = GetTypeName<T>();
+            foreach (var service in _services.Values)
             {
-                throw new InvalidOperationException(key);
+                if (service is T gameService)
+                {
+                    return gameService;
+                }
             }
-
-            return (T)_services[key];
+            throw new InvalidOperationException(key);
         }
 
         private string GetTypeName<T>()

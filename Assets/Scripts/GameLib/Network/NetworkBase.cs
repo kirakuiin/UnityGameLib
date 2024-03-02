@@ -1,4 +1,6 @@
 using System.Net;
+using GameLib.Common;
+using GameLib.Network.NGO;
 
 namespace GameLib.Network
 {
@@ -31,6 +33,22 @@ namespace GameLib.Network
         public static IPEndPoint GetBroadcastIPEndPoint(int port)
         {
             return new IPEndPoint(IPAddress.Broadcast, port);
+        }
+
+        /// <summary>
+        /// 根据输入的ip和端口获得<see cref="IPEndPoint"/>对象。
+        /// </summary>
+        /// <param name="ip">ip地址</param>
+        /// <param name="port">端口号</param>
+        /// <returns>IPEndPoint对象</returns>
+        /// <exception cref="IPParseException"></exception>
+        public static IPEndPoint GetIPEndPoint(string ip, ushort port)
+        {
+            if (IPAddress.TryParse(ip, out var ipAddress))
+            {
+                return new IPEndPoint(ipAddress, port);
+            }
+            throw new IPParseException(ip);
         }
     }
 }

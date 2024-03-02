@@ -33,10 +33,5 @@ namespace GameLib.Network.NGO.ConnectionManagement
                 ConnManager.ChangeState<OfflineState>();
             }
         }
-
-        public override string GetStateType()
-        {
-            return nameof(ClientConnectedState);
-        }
     }
 }

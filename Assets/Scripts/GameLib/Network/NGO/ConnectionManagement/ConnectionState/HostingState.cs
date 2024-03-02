@@ -1,5 +1,6 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
+using System.Linq;
 
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement
@@ -20,20 +21,16 @@ namespace GameLib.Network.NGO.ConnectionManagement
         {
         }
 
-        public override string GetStateType()
-        {
-            return nameof(HostingState);
-        }
-
         public override void OnUserRequestShutdown()
         {
+            var idsNeedToDisconnect = (from clientID in NetManager.ConnectedClientsIds
+                where clientID != NetManager.LocalClientId
+                select clientID).ToList();
+            
             var reason = JsonUtility.ToJson(ConnectStatus.HostEndSession);
-            foreach (var clientID in NetManager.ConnectedClientsIds)
+            foreach (var clientID in idsNeedToDisconnect)
             {
-                if (clientID != NetManager.LocalClientId)
-                {
-                    NetManager.DisconnectClient(clientID, reason);
-                }
+                NetManager.DisconnectClient(clientID, reason);
             }
             base.OnUserRequestShutdown();
         }
@@ -66,7 +63,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
             if (status == ConnectStatus.Success)
             {
                 response.Approved = true;
-                response.CreatePlayerObject = false;
+                response.CreatePlayerObject = true;
             }
             else
             {

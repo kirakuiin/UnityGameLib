@@ -72,10 +72,5 @@ namespace GameLib.Network.NGO.ConnectionManagement
         public override void Exit()
         {
         }
-
-        public override string GetStateType()
-        {
-            return nameof(ClientConnectingState);
-        }
     }
 }

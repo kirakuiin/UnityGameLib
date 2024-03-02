@@ -112,15 +112,12 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public class DirectIPConnectionMethod : ConnectionMethod
     {
-        private readonly IPAddress _ip;
+        private readonly IPEndPoint _endPoint;
 
-        private readonly ushort _port;
-
-        public DirectIPConnectionMethod(IPAddress ip, ushort port)
+        public DirectIPConnectionMethod(IPEndPoint endPoint)
         : base(PlayerGuid.GetGuidByMachine())
         {
-            _ip = ip;
-            _port = port;
+            _endPoint = endPoint;
         }
         
         public override async Task SetupHostConnectionAsync()
@@ -132,7 +129,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
         {
             SetConnectionPayload();
             var utp = (UnityTransport)NetworkManager.Singleton.NetworkConfig.NetworkTransport;
-            utp.SetConnectionData(_ip.ToString(), _port);
+            utp.SetConnectionData(_endPoint.Address.ToString(), (ushort)_endPoint.Port);
         }
 
         public override async Task SetupClientConnectionAsync()

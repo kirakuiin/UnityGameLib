@@ -26,13 +26,6 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// 处理离开状态前的清理操作。
         /// </summary>
         public abstract void Exit();
-
-        /// <summary>
-        /// 获得状态的名称。
-        /// </summary>
-        /// <remarks>如果想要替换某个非抽象类的功能，那么不应该重写此函数，要保持同继承树内名称相同。</remarks>
-        /// <returns>字符串</returns>
-        public abstract string GetStateType();
         
         /// <summary>
         /// 处理客户端连接时的工作。
@@ -59,9 +52,8 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// <summary>
         /// 启动客户端。
         /// </summary>
-        /// <param name="ipAddress">服务端的IP地址</param>
-        /// <param name="port">服务端端口号</param>
-        public virtual void StartClient(IPAddress ipAddress, int port) {}
+        /// <param name="endPoint">服务端的地址</param>
+        public virtual void StartClient(IPEndPoint endPoint) {}
 
         /// <summary>
         /// 启动主机。
