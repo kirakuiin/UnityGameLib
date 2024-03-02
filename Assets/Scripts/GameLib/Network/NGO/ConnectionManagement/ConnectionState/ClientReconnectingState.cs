@@ -31,7 +31,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
             ConnectStatus.UserRequestedDisconnect,
         };
         
-        protected ClientReconnectingState(ConnectionMethod method) : base(method)
+        public ClientReconnectingState(ConnectionMethod method) : base(method)
         {
         }
         
@@ -93,7 +93,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
 
         public override void OnClientDisconnected(ulong clientID)
         {
-            if (_currentAttemptNum < ConnManager.config.maxConnectedPlayerNum)
+            if (_currentAttemptNum < ConnManager.config.reconnectAttemptNum)
             {
                 ContinueReconnect();
             }

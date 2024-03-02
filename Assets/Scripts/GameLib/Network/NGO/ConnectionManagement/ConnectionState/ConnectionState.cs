@@ -11,11 +11,11 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public abstract class ConnectionState
     {
-        protected IPublisher<ConnectStatus> Publisher = ServiceLocator.Instance.Get<IPublisher<ConnectStatus>>();
+        protected readonly IPublisher<ConnectStatus> Publisher = ServiceLocator.Instance.Get<IPublisher<ConnectStatus>>();
 
-        protected ConnectionManager ConnManager = ConnectionManager.Instance;
+        protected readonly ConnectionManager ConnManager = ConnectionManager.Instance;
 
-        protected NetworkManager NetManager = NetworkManager.Singleton;
+        protected readonly NetworkManager NetManager = NetworkManager.Singleton;
 
         /// <summary>
         /// 处理进入状态前的准备工作。

@@ -47,4 +47,21 @@ namespace GameLib.Network.NGO.Channel
         /// </summary>
         public bool IsDisposed { get; }
     }
+    
+    /// <summary>
+    /// 支持缓存功能的信息通道。
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IBufferedMessageChannel<T> : IMessageChannel<T>
+    {
+        /// <summary>
+        /// 是否存在缓存的消息。
+        /// </summary>
+        bool HasBufferedMessage { get; }
+        
+        /// <summary>
+        /// 被缓存的消息。
+        /// </summary>
+        T BufferedMessage { get; }
+    }
 }

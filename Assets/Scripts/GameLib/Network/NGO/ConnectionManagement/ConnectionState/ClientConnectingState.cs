@@ -13,7 +13,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
     {
         protected readonly ConnectionMethod ConnMethod;
 
-        protected ClientConnectingState(ConnectionMethod method)
+        public ClientConnectingState(ConnectionMethod method)
         {
             ConnMethod = method;
         }
