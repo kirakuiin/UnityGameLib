@@ -109,7 +109,8 @@ namespace UnitTest.Scene
         void RandomPos(NetworkObject obj)
         {
             var posList = new List<int>() {-2, -1, 0, 1, 2};
-            obj.gameObject.transform.position = new Vector3(posList.Choice(), posList.Choice());
+            var random = new System.Random();
+            obj.gameObject.transform.position = new Vector3(random.Choice(posList), random.Choice(posList));
         }
             
     }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 
 namespace GameLib.Common.Extension
 {
@@ -13,20 +11,9 @@ namespace GameLib.Common.Extension
         /// <param name="i">第一个下标</param>
         /// <param name="j">第二个下标</param>
         /// <typeparam name="T"></typeparam>
-        public static void Swap<T>(this List<T> list, int i, int j)
+        public static void Swap<T>(this IList<T> list, int i, int j)
         {
             (list[i], list[j]) = (list[j], list[i]);
-        }
-        
-        /// <summary>
-        /// 在列表中随机挑选一个元素并返回
-        /// </summary>
-        /// <returns>被选中的元素</returns>
-        public static T Choice<T>(this List<T> list)
-        {
-            var random = new Random();
-            var index = random.Next(0, list.Count);
-            return list[index];
         }
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
 using GameLib.Common.Extension;
+using System;
 
 
 namespace UnitTest.Scene 
@@ -42,7 +43,8 @@ namespace UnitTest.Scene
 
         private Vector3 GetPosition()
         {
-            return new Vector3(_range.Choice(), _range.Choice());
+            var random = new System.Random();
+            return new Vector3(random.Choice(_range), random.Choice(_range));
         }
         
         private void DespawnCube()
