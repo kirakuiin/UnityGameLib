@@ -3,10 +3,8 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
 using GameLib.Common.Extension;
-using System;
 
-
-namespace UnitTest.Scene 
+namespace Tests.Scene 
 {
     /// <summary>
     /// 测试<c>NetworkObjectPool</c>

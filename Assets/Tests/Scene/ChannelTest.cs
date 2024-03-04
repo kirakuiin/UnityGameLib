@@ -4,7 +4,7 @@ using GameLib.Network.NGO.Channel;
 using Unity.Collections;
 using Unity.Netcode;
 
-namespace UnitTest.Scene 
+namespace Tests.Scene 
 {
     /// <summary>
     /// 测试<c>NetworkedMessageChannel</c>

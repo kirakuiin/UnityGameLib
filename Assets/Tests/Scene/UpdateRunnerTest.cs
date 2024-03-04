@@ -3,7 +3,7 @@ using GameLib.Common;
 using UnityEngine;
 using TMPro;
 
-namespace UnitTest.Scene
+namespace Tests.Scene
 {
     public class UpdateRunnerTest : MonoBehaviour
     {

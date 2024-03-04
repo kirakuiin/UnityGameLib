@@ -1,7 +1,7 @@
 ﻿using GameLib.Network.NGO;
 using NUnit.Framework;
 
-namespace UnitTest.Editor
+namespace Tests.Editor
 {
     public struct PlayerTestData : ISessionPlayerData
     {

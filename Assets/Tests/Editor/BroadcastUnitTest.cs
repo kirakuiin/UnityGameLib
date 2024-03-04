@@ -2,7 +2,7 @@
 using GameLib.Network;
 using NUnit.Framework;
 
-namespace UnitTest.Editor
+namespace Tests.Editor
 {
     [TestFixture]
     public class BroadcastUnitTest

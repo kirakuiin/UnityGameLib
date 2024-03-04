@@ -7,10 +7,9 @@ using GameLib.Network;
 using UnityEngine;
 using GameLib.Network.NGO.Channel;
 using GameLib.Network.NGO.ConnectionManagement;
-using TMPro;
 using Unity.Netcode;
 
-namespace UnitTest.Scene
+namespace Tests.Scene
 {
     public class ConnectionTest : MonoBehaviour
     {

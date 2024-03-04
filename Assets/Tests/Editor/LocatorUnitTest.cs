@@ -1,7 +1,7 @@
 ﻿using GameLib.Common;
 using NUnit.Framework;
 
-namespace UnitTest.Editor
+namespace Tests.Editor
 {
     [TestFixture]
     public class LocatorUnitTest

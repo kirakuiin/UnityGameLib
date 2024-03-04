@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnitTest
+namespace Tests
 {
     public class UnitTestException : Exception
     {
