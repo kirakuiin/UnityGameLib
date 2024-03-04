@@ -1,20 +1,20 @@
 ﻿using System.Globalization;
 using GameLib.Common;
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
 
 namespace Tests.Scene
 {
     public class UpdateRunnerTest : MonoBehaviour
     {
         [SerializeField]
-        private TMP_Text frameText;
+        private Text frameText;
         
         [SerializeField]
-        private TMP_Text secondText;
+        private Text secondText;
         
         [SerializeField]
-        private TMP_Text timeText;
+        private Text timeText;
 
         private int _secCalledTime = 0;
 
