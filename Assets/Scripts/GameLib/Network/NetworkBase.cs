@@ -1,5 +1,4 @@
 using System.Net;
-using GameLib.Common;
 using GameLib.Network.NGO;
 
 namespace GameLib.Network

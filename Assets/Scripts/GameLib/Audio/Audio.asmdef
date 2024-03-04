@@ -1,0 +1,17 @@
+{
+    "name": "GameLib.Audio",
+    "references":[ "GUID:1a1ac9df26f3f664da5fcc345b16ebd2" ],
+    "rootNamespace": "",
+    "references": [
+        "GUID:1a1ac9df26f3f664da5fcc345b16ebd2"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
