@@ -29,5 +29,16 @@ namespace GameLib.Audio
             source.time = 0;
             source.Play();
         }
+
+        /// <summary>
+        /// 停止播放。
+        /// </summary>
+        public void Stop()
+        {
+            if (source.isPlaying)
+            {
+                source.Stop();
+            }
+        }
     }
 }
