@@ -146,8 +146,10 @@ namespace GameLib.Common
                     _instance = FindObjectOfType<T>();
                     if (_instance == null)
                     {
-                        var obj = new GameObject();
-                        obj.name = typeof(T).Name;
+                        var obj = new GameObject
+                        {
+                            name = typeof(T).Name
+                        };
                         _instance = obj.AddComponent<T>();
                         _instance.OnMonoSingletonCreated();
                     }

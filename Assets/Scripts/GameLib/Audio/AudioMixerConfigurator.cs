@@ -1,5 +1,4 @@
-﻿using GameLib.Common;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Audio;
 
 namespace GameLib.Audio
@@ -19,6 +18,8 @@ namespace GameLib.Audio
         /// </summary>
         private const int VolumeLog10Multiplier = 20;
 
+        private const float VolumeMin = 0.0001f;
+
         /// <summary>
         /// 设置混音器里的浮点变量。
         /// </summary>
@@ -26,14 +27,14 @@ namespace GameLib.Audio
         /// <param name="value">值</param>
         public void SetFloat(string key, float value)
         {
-            mixer.SetFloat(key, GetVolumeInDecibels(value));
+            mixer.SetFloat(key, ChangeVolumeToDecibels(value));
         }
 
-        private float GetVolumeInDecibels(float volume)
+        private float ChangeVolumeToDecibels(float volume)
         {
             if (volume <= 0)
             {
-                volume = 0.0001f;
+                volume = VolumeMin;
             }
 
             if (volume >= 1)
@@ -42,6 +43,38 @@ namespace GameLib.Audio
             }
 
             return Mathf.Log10(volume) * VolumeLog10Multiplier;
+        }
+
+        /// <summary>
+        /// 获得混音器里的浮点变量。
+        /// </summary>
+        /// <remarks>如果值不存在则返回<see cref="VolumeMin"/></remarks>
+        /// <param name="key">键</param>
+        public float GetFloat(string key)
+        {
+            if (mixer.GetFloat(key, out float value))
+            {
+                return ChangeDecibelsToVolume(value);
+            }
+            else
+            {
+                return VolumeMin;
+            }
+        }
+
+        private float ChangeDecibelsToVolume(float decibels)
+        {
+            if (decibels < -80)
+            {
+                decibels = -80;
+            }
+
+            if (decibels > 0)
+            {
+                decibels = 0;
+            }
+
+            return Mathf.Pow(10, decibels / VolumeLog10Multiplier);
         }
     }
 }
