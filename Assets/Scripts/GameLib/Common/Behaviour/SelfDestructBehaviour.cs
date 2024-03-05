@@ -3,7 +3,7 @@
 namespace GameLib.Common.Behaviour
 {
     /// <summary>
-    /// 经过一定事件后会自动销毁的<see cref="MonoBehaviour"/>
+    /// 经过一定时间后会自动销毁的<see cref="MonoBehaviour"/>
     /// </summary>
     public class SelfDestructBehaviour : MonoBehaviour
     {

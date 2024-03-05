@@ -4,7 +4,7 @@ using GameLib.Common;
 namespace GameLib.Audio
 {
     [RequireComponent(typeof(AudioSource))]
-    public class MusicPlayer : PersistentMonoSingleton<MusicPlayer>
+    public class MusicPlayer : MonoBehaviour
     {
         [Tooltip("音源")]
         [SerializeField]

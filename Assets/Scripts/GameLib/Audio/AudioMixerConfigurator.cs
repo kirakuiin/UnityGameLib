@@ -7,7 +7,7 @@ namespace GameLib.Audio
     /// <summary>
     /// 音量混合配置器，用来设置音量混合器中的相关参数。
     /// </summary>
-    public class AudioMixerConfigurator : PersistentMonoSingleton<AudioMixerConfigurator>
+    public class AudioMixerConfigurator : MonoBehaviour
     {
         [Tooltip("音量混合器")]
         [SerializeField]

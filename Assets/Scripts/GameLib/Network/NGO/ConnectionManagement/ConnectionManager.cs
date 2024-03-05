@@ -81,7 +81,6 @@ namespace GameLib.Network.NGO.ConnectionManagement
             _currentState.OnTransportFailure();
         }
 
-
         private void OnDestroy()
         {
             if (NetworkManager.Singleton is null) return;
