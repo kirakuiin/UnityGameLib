@@ -13,7 +13,7 @@ namespace GameLib.Common.Behaviour
         /// <summary>
         /// 是否可以持续存在。
         /// </summary>
-        private bool IsPersist { get; } = false;
+        protected virtual bool IsPersist { get; } = false;
 
         /// <summary>
         /// 游戏当前的状态。
