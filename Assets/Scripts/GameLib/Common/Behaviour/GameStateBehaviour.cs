@@ -22,7 +22,7 @@ namespace GameLib.Common.Behaviour
 
         private static GameObject _activeStateGameObject;
 
-        protected void Start()
+        protected virtual void Start()
         {
             if (CleanPrevState())
             {
