@@ -2,6 +2,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO
 {
     /// <summary>

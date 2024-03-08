@@ -14,4 +14,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TestScenes/ConnectionTest.unity
     guid: 092f0d077214e9d489d1644aba67ae64
+  - enabled: 1
+    path: Assets/Scenes/TestScenes/SceneSyncSubTest/SceneTest02.unity
+    guid: f68b1b82a352dd443b214d6034c775b7
+  - enabled: 1
+    path: Assets/Scenes/TestScenes/SceneSyncSubTest/SceneTest01.unity
+    guid: cab109a2375bffb49a55415c53ee181b
+  - enabled: 1
+    path: Assets/Scenes/TestScenes/SceneSyncTest.unity
+    guid: e4ec73c0f21d2f944bd4e4212a297cb5
   m_configObjects: {}

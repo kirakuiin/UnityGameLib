@@ -1,5 +1,6 @@
 ﻿using GameLib.Common;
 
+// ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO
 {
     /// <summary>
