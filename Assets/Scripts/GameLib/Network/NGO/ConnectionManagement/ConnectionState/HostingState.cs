@@ -57,7 +57,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// </summary>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        protected void SetResponse(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        protected virtual void SetResponse(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
             var status = GetConnectStatus(request);
             if (status == ConnectStatus.Success)
