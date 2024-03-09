@@ -138,6 +138,22 @@ namespace GameLib.Network.NGO.ConnectionManagement
         }
 
         /// <summary>
+        /// 获得实现了指定接口地状态。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public IEnumerable<T> GetStatesByInterface<T>()
+        {
+            foreach (var state in _statesInfo.Values)
+            {
+                if (state is T tState)
+                {
+                    yield return tState;
+                }
+            }
+        }
+        
+        /// <summary>
         /// 玩家主动要求关闭连接时调用。
         /// </summary>
         public void UserRequestShutdown()

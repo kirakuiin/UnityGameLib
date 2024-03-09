@@ -9,15 +9,20 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// 表示客户端正尝试连接服务器，进入此状态则启动客户端。
     /// 如果连接成功则进入<see cref="ClientConnectedState"/>；否则进入<see cref="OfflineState"/>。
     /// </summary>
-    public class ClientConnectingState : OnlineState
+    public class ClientConnectingState : OnlineState, IConnectionResettable
     {
-        protected readonly ConnectionMethod ConnMethod;
-
+        protected ConnectionMethod ConnMethod;
+        
         public ClientConnectingState(ConnectionMethod method)
         {
             ConnMethod = method;
         }
-        
+
+        public void SetConnectionMethod(ConnectionMethod method)
+        {
+            ConnMethod = method;
+        }
+
         public override void Enter()
         {
 #pragma warning disable CS4014 // 由于此调用不会等待，因此在调用完成前将继续执行当前方法

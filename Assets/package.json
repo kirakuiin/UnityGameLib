@@ -1,7 +1,7 @@
 {
     "name": "com.nico.gamelib",
     "displayName": "GameLib",
-    "version": "0.9.10",
+    "version": "0.9.11",
     "unity": "2022.3",
     "description": "提供游戏开发时常用的基础功能。",
     "license": "MIT",
@@ -9,5 +9,9 @@
     "dependencies": {
         "com.unity.netcode.gameobjects": "1.7.1",
         "com.unity.test-framework": "1.1.33"
+    },
+    "author": {
+        "name": "wang.zhuowei",
+        "email": "549676201@qq.com"
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
+using System.Linq;
 using GameLib.Common;
 using GameLib.Common.Extension;
 using GameLib.Network;
@@ -45,6 +45,7 @@ namespace Tests.Scene
             ConnectionManager.Instance.AddState(new ClientConnectingState(connectMethod));
             ConnectionManager.Instance.AddState(new ClientConnectedState());
             ConnectionManager.Instance.AddState(new ClientReconnectingState(connectMethod));
+            Debug.Log(ConnectionManager.Instance.GetStatesByInterface<IConnectionResettable>().Count());
         }
 
         private void OnGUI()

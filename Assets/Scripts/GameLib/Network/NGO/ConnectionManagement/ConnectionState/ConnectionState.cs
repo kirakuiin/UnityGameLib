@@ -7,6 +7,18 @@ using Unity.Netcode;
 namespace GameLib.Network.NGO.ConnectionManagement
 {
     /// <summary>
+    /// 可以重新设置连接方法的类型。
+    /// </summary>
+    public interface IConnectionResettable
+    {
+        /// <summary>
+        /// 重新设置连接方法。
+        /// </summary>
+        /// <param name="method">连接方法</param>
+        public void SetConnectionMethod(ConnectionMethod method);
+    }
+    
+    /// <summary>
     /// 代表连接状态的抽象类
     /// </summary>
     public abstract class ConnectionState
