@@ -1,16 +1,16 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 using GameLib.Common;
 
 namespace GameLib.Network
 {
     /// <summary>
-    /// 提供广播发送功能
+    /// 提供广播发送功能。
     /// </summary>
-    public class BroadcastSender
+    /// <typeparam name="T"></typeparam>
+    public class BroadcastSender<T> where T : struct
     {
         private readonly UdpClient _udpSender = new(Address.DefaultIPEndPoint);
 
@@ -27,13 +27,10 @@ namespace GameLib.Network
         /// 默认值为空
         /// </para>
         /// </value>
-        public string SentMessage {get; set;} = "";
+        public T SentMessage {get; set;}
 
         /// <value>
-        /// 广播的端口号
-        /// <para>
-        /// 默认值为<c>DefaultBroadcastPort</c>
-        /// </para>
+        /// 广播的端口号。
         /// </value>
         public int BroadcastPort
         {
@@ -51,13 +48,13 @@ namespace GameLib.Network
         }
 
         /// <summary>
-        /// 广播指定的字符串消息。
+        /// 广播指定的消息。
         /// </summary>
-        /// <param name="message">待广播字符串</param>
-        /// <returns>发送的字节数。</returns>
-        public int Broadcast(string message)
+        /// <param name="message">待广播消息</param>
+        /// <returns>发送的字节数</returns>
+        public int Broadcast(T message)
         {
-            var data = Encoding.UTF8.GetBytes(message);
+            var data = SerializeTool.Serialize(message);
             return _udpSender.Send(data, data.Length, _endPoint);
         }
     }
@@ -65,7 +62,8 @@ namespace GameLib.Network
     /// <summary>
     /// 提供接受Udp广播功能。
     /// </summary>
-    public class BroadcastReceiver
+    /// <typeparam name="T"></typeparam>
+    public class BroadcastReceiver<T> where T : struct
     {
         private readonly UdpClient _udpReceiver;
 
@@ -73,7 +71,7 @@ namespace GameLib.Network
         /// 以广播端口构建一个接受对象
         /// </summary>
         /// <param name="broadcastPort"></param>
-        public BroadcastReceiver(int broadcastPort=BroadcastSender.DefaultBroadcastPort)
+        public BroadcastReceiver(int broadcastPort=BroadcastSender<T>.DefaultBroadcastPort)
         {
             _udpReceiver = new UdpClient(new IPEndPoint(IPAddress.Any, broadcastPort));
         }
@@ -91,13 +89,14 @@ namespace GameLib.Network
     }
 
     /// <summary>
-    /// 提供定时发出广播的功能
+    /// 提供定时发出广播的功能。
     /// </summary>
-    public class TimedBroadcaster
+    /// <typeparam name="T"></typeparam>
+    public class TimedBroadcaster<T> where T : struct
     {
-        private readonly BroadcastSender _sender;
+        private readonly BroadcastSender<T> _sender;
 
-        private const float DefaultBroadcastInterval = 1.0f;
+        private const float DefaultBroadcastInterval = 2.0f;
 
         public bool IsSending {private set; get;} = false;
 
@@ -105,7 +104,7 @@ namespace GameLib.Network
         /// 以广播端口为参数构造对象
         /// </summary>
         /// <param name="broadcastPort"></param>
-        public TimedBroadcaster(int broadcastPort=BroadcastSender.DefaultBroadcastPort)
+        public TimedBroadcaster(int broadcastPort=BroadcastSender<T>.DefaultBroadcastPort)
         {
             _sender = new(){BroadcastPort=broadcastPort};
         }
@@ -120,7 +119,7 @@ namespace GameLib.Network
         /// 开启广播，发送指定消息
         /// </summary>
         /// <param name="message">消息字符串</param>
-        public async void StartBroadcast(string message)
+        public async void StartBroadcast(T message)
         {
             IsSending = true;
             _sender.SentMessage = message;
@@ -141,13 +140,14 @@ namespace GameLib.Network
     }
 
     /// <summary>
-    /// 提供不断接受广播的功能
+    /// 提供不断接受广播的功能。
     /// </summary>
-    public class BroadcastListener
+    /// <typeparam name="T"></typeparam>
+    public class BroadcastListener<T> where T : struct
     {
-        private readonly BroadcastReceiver _receiver;
+        private readonly BroadcastReceiver<T> _receiver;
 
-        public BroadcastListener(int broadcastPort=BroadcastSender.DefaultBroadcastPort)
+        public BroadcastListener(int broadcastPort=BroadcastSender<T>.DefaultBroadcastPort)
         {
             _receiver = new(broadcastPort);
         }
@@ -172,7 +172,7 @@ namespace GameLib.Network
 
         private void InvokeEvent(UdpReceiveResult package)
         {
-            var message = Encoding.UTF8.GetString(package.Buffer);
+            var message = SerializeTool.Deserialize<T>(package.Buffer);
             OnReceivedBroadcast?.Invoke(package.RemoteEndPoint.Address, message);
         }
 
@@ -188,9 +188,9 @@ namespace GameLib.Network
         /// 当收到广播时触发事件。
         /// <para>
         /// <c>IPAddress</c>: 发送者的IP信息
-        /// <c>string</c>: 广播携带的消息
+        /// <c>T</c>: 广播携带的消息
         /// </para>
         /// </summary>
-        public event Action<IPAddress, string> OnReceivedBroadcast;
+        public event Action<IPAddress, T> OnReceivedBroadcast;
     }
 }

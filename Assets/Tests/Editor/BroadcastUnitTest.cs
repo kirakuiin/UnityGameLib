@@ -1,22 +1,36 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using GameLib.Network;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Tests.Editor
 {
+    [Serializable]
+    public struct Message
+    {
+        public int value;
+        public string name;
+
+        public override string ToString()
+        {
+            return $"{name},{value}";
+        }
+    }
+    
     [TestFixture]
     public class BroadcastUnitTest
     {
-        private readonly TimedBroadcaster _sender = new TimedBroadcaster();
-        private readonly BroadcastListener _receiver = new BroadcastListener();
-        private const string Message = "hello world!";
+        private readonly TimedBroadcaster<Message> _sender = new();
+        private readonly BroadcastListener<Message> _receiver = new();
+        private readonly Message _sentMsg = new () {value = 1, name = "hello"};
 
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
             _receiver.StartListen();
             _receiver.OnReceivedBroadcast += OnReceivedBroadcast;
-            _sender.StartBroadcast(Message);
+            _sender.StartBroadcast(_sentMsg);
         }
 
         [OneTimeTearDown]
@@ -26,8 +40,10 @@ namespace Tests.Editor
             _sender.StopBroadcast();
         }
 
-        void OnReceivedBroadcast(IPAddress addr, string msg)
+        void OnReceivedBroadcast(IPAddress addr, Message msg)
         {
+            Debug.Log(addr.ToString());
+            Debug.Log(msg.ToString());
         }
 
         [Test]
