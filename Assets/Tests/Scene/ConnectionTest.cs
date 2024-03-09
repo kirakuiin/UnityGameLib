@@ -71,14 +71,13 @@ namespace Tests.Scene
 
         void ShowSelection()
         {
-            var endPoint = Address.GetIPEndPoint(ipAddr, port);
             if (GUILayout.Button("创建主机"))
             {
-                ConnectionManager.Instance.StartHost(endPoint);
+                ConnectionManager.Instance.StartHost();
             }
             if (GUILayout.Button("加入服务端"))
             {
-                ConnectionManager.Instance.StartClient(endPoint);
+                ConnectionManager.Instance.StartClient();
             }
         }
 

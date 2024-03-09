@@ -64,8 +64,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// <summary>
         /// 启动客户端。
         /// </summary>
-        /// <param name="endPoint">服务端的地址</param>
-        public virtual void StartClient(IPEndPoint endPoint) {}
+        public virtual void StartClient() {}
 
         /// <summary>
         /// 启动主机。

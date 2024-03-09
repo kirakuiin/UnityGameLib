@@ -164,8 +164,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// <summary>
         /// 启动主机。
         /// </summary>
-        /// <param name="endPoint">服务端的地址</param>
-        public void StartHost(IPEndPoint endPoint)
+        public void StartHost()
         {
             _currentState.StartHost();
         }
@@ -173,10 +172,9 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// <summary>
         /// 启动客户端。
         /// </summary>
-        /// <param name="endPoint">服务端的地址</param>
-        public void StartClient(IPEndPoint endPoint)
+        public void StartClient()
         {
-            _currentState.StartClient(endPoint);
+            _currentState.StartClient();
         }
     }
 }

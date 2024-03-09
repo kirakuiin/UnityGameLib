@@ -18,7 +18,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
         {
         }
 
-        public override void StartClient(IPEndPoint endPoint)
+        public override void StartClient()
         {
             ConnManager.ChangeState<ClientConnectingState>();
         }
