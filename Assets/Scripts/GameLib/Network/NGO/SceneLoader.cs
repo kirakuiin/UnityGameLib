@@ -149,5 +149,14 @@ namespace GameLib.Network.NGO
             }
             base.OnDestroy();
         }
+
+        protected override void OnInitializing()
+        {
+            base.OnInitializing();
+            if (Application.isPlaying)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
+        }
     }
 }
