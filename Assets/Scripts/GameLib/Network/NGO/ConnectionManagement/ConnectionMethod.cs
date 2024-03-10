@@ -76,7 +76,6 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// <summary>
         /// 设置连接时携带的数据。
         /// </summary>
-        /// <param name="playerID">玩家ID</param>
         protected virtual void SetConnectionPayload()
         {
             var payload = new ConnectionPayload()
@@ -84,27 +83,8 @@ namespace GameLib.Network.NGO.ConnectionManagement
                 playerID = PlayerID,
                 isDebug = Debug.isDebugBuild,
             };
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = CreatePayload(payload);
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = SerializeTool.Serialize(payload);
         }
-        
-        private byte[] CreatePayload<T>(T obj) where T : struct
-        {
-            var payloadStr = JsonUtility.ToJson(obj);
-            return System.Text.Encoding.UTF8.GetBytes(payloadStr);
-        }
-
-        /// <summary>
-        /// 将结构体从字节流中解压出来。
-        /// </summary>
-        /// <param name="payload">字节流</param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns>结构体对象</returns>
-        public static T DumpPayload<T>(byte[] payload) where T : struct
-        {
-            var payloadStr = System.Text.Encoding.UTF8.GetString(payload);
-            return JsonUtility.FromJson<T>(payloadStr);
-        }
-        
     }
     
     /// <summary>

@@ -1,6 +1,7 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
+using GameLib.Common;
 
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement
@@ -77,9 +78,9 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        protected ConnectStatus GetConnectStatus(NetworkManager.ConnectionApprovalRequest request)
+        protected virtual ConnectStatus GetConnectStatus(NetworkManager.ConnectionApprovalRequest request)
         {
-            var payload = ConnectionMethod.DumpPayload<ConnectionPayload>(request.Payload);
+            var payload = SerializeTool.Deserialize<ConnectionPayload>(request.Payload);
             if (NetManager.ConnectedClientsIds.Count >= ConnManager.config.maxConnectedPlayerNum)
             {
                 return ConnectStatus.ServerFull;

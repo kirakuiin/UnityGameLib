@@ -56,5 +56,10 @@
         /// 客户端启动失败，可能是连接服务器失败或是提供的ip信息错误。
         /// </summary>
         StartClientFailed,
+        
+        /// <summary>
+        /// 客户端认证失败，比如说密码错误。
+        /// </summary>
+        ApprovalFailed,
     }
 }
