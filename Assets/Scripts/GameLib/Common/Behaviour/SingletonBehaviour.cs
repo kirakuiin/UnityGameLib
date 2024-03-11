@@ -10,7 +10,7 @@ namespace GameLib.Common.Behaviour
     {
         private static SingletonBehaviour _instance;
         
-        private void Awake()
+        protected virtual void Awake()
         {
             if (_instance is null)
             {

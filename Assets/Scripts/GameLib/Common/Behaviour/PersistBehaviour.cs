@@ -7,7 +7,7 @@ namespace GameLib.Common.Behaviour
     /// </summary>
     public class PersistBehaviour: MonoBehaviour
     {
-        protected void Awake()
+        protected virtual void Awake()
         {
             if (Application.isPlaying)
             {

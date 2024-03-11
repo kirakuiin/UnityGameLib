@@ -11,7 +11,7 @@ namespace GameLib.Common.Behaviour
         [SerializeField]
         private float lifeSpanSeconds;
 
-        protected void Start()
+        protected virtual void Start()
         {
             Destroy(gameObject, lifeSpanSeconds);
         }

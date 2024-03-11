@@ -13,7 +13,7 @@ namespace GameLib.Common.Behaviour
 
         private float _disableTimestamp;
 
-        protected void Update()
+        protected virtual void Update()
         {
             if (Time.time >= _disableTimestamp)
             {

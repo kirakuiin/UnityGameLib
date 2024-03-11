@@ -9,7 +9,7 @@ namespace Tests.Scene
     /// <summary>
     /// 测试<c>NetworkObjectPool</c>
     /// </summary>
-    public class PoolTest : MonoBehaviour
+    public class NetworkPoolTest : MonoBehaviour
     {
         [SerializeField] private GameObject cubePrefab;
 
