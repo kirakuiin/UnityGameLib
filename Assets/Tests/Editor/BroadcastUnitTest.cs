@@ -36,7 +36,7 @@ namespace Tests.Editor
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            _receiver.StartListen();
+            _receiver.StopListen();
             _sender.StopBroadcast();
         }
 

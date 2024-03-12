@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -6,6 +8,14 @@ using GameLib.Common;
 
 namespace GameLib.Network
 {
+    /// <summary>
+    /// 任务标记。
+    /// </summary>
+    internal class BroadcastTaskInfo
+    {
+        public bool IsRunning { set; get; } = true;
+    }
+    
     /// <summary>
     /// 提供广播发送功能。
     /// </summary>
@@ -87,7 +97,7 @@ namespace GameLib.Network
         }
 
     }
-
+    
     /// <summary>
     /// 提供定时发出广播的功能。
     /// </summary>
@@ -98,7 +108,9 @@ namespace GameLib.Network
 
         private const float DefaultBroadcastInterval = 2.0f;
 
-        public bool IsSending {private set; get;} = false;
+        private readonly Queue<BroadcastTaskInfo> _tasks = new();
+
+        public bool IsSending => _tasks.Any(info => info.IsRunning);
 
         /// <summary>
         /// 以广播端口为参数构造对象
@@ -116,14 +128,24 @@ namespace GameLib.Network
         public float BroadcastInterval {set; get;} = DefaultBroadcastInterval;
 
         /// <summary>
+        /// 修改发送信息。
+        /// </summary>
+        /// <param name="message">新的信息</param>
+        public void ChangeMessage(T message)
+        {
+            _sender.SentMessage = message;
+        }
+
+        /// <summary>
         /// 开启广播，发送指定消息
         /// </summary>
         /// <param name="message">消息字符串</param>
         public async void StartBroadcast(T message)
         {
-            IsSending = true;
+            var taskInfo = new BroadcastTaskInfo();
+            _tasks.Enqueue(taskInfo);
             _sender.SentMessage = message;
-            while (IsSending)
+            while (taskInfo.IsRunning)
             {
                 _sender.Broadcast();
                 await Task.Delay((int)(BroadcastInterval*(int)TimeScalar.MillisecondsPerSecond));
@@ -135,7 +157,10 @@ namespace GameLib.Network
         /// </summary>
         public void StopBroadcast()
         {
-            IsSending = false;
+            if (_tasks.Count > 0)
+            {
+                _tasks.Dequeue().IsRunning = false;
+            }
         }
     }
 
@@ -147,6 +172,8 @@ namespace GameLib.Network
     {
         private readonly BroadcastReceiver<T> _receiver;
 
+        private readonly Queue<BroadcastTaskInfo> _tasks = new();
+
         public BroadcastListener(int broadcastPort=BroadcastSender<T>.DefaultBroadcastPort)
         {
             _receiver = new(broadcastPort);
@@ -155,15 +182,16 @@ namespace GameLib.Network
         /// <value>
         /// 是否正在监听
         /// </value>
-        public bool IsListening {private set; get;} = false;
+        public bool IsListening => _tasks.Any(info => info.IsRunning);
 
         /// <summary>
         /// 开始监听广播
         /// </summary>
         public async void StartListen()
         {
-            IsListening = true;
-            while (IsListening)
+            var task = new BroadcastTaskInfo();
+            _tasks.Enqueue(task);
+            while (task.IsRunning)
             {
                 var package = await _receiver.ReceiveAsync();
                 InvokeEvent(package);
@@ -181,7 +209,10 @@ namespace GameLib.Network
         /// </summary>
         public void StopListen()
         {
-            IsListening = false;
+            if (_tasks.Count > 0)
+            {
+                _tasks.Dequeue().IsRunning = false;
+            }
         }
 
         /// <summary>
