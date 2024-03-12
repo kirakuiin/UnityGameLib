@@ -15,13 +15,13 @@ namespace GameLib.Network
         public static readonly IPEndPoint DefaultIPEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
         /// <summary>
-        /// 得到本机的IP地址。
+        /// 获得万用的IP，代表本机所有的IP。
         /// </summary>
-        /// <returns><c>IPAddress</c>代表本机的IP地址</returns>
-        public static IPAddress GetLocalIPAddress()
+        /// <returns></returns>
+        public static IPAddress GetUniversalIPAddress()
         {
-            var ipAddressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
-            return ipAddressList[^1];
+            IPAddress.TryParse("0.0.0.0", out var result);
+            return result;
         }
 
         /// <summary>
