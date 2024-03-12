@@ -27,6 +27,7 @@ namespace GameLib.Common.Behaviour
             if (CleanPrevState())
             {
                 SetNewState();
+                Enter();
             }
         }
 
@@ -53,6 +54,25 @@ namespace GameLib.Common.Behaviour
             {
                 DontDestroyOnLoad(gameObject);
             }
+        }
+
+        /// <summary>
+        /// 进入状态时执行的操作。
+        /// </summary>
+        protected virtual void Enter()
+        {
+        }
+
+        protected virtual void OnDestroy()
+        {
+            Exit();
+        }
+
+        /// <summary>
+        /// 退出状态时执行的操作。
+        /// </summary>
+        protected virtual void Exit()
+        {
         }
     }
 }

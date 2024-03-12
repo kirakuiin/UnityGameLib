@@ -1,7 +1,7 @@
 {
     "name": "com.nico.gamelib",
     "displayName": "GameLib",
-    "version": "0.9.20",
+    "version": "0.9.21",
     "unity": "2022.3",
     "description": "提供游戏开发时常用的基础功能。",
     "license": "MIT",
