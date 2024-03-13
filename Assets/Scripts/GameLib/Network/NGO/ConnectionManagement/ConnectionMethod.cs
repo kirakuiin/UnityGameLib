@@ -46,7 +46,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public abstract class ConnectionMethod
     {
-        protected readonly string PlayerID;
+        protected string PlayerID { set; get; }
         
         protected ConnectionMethod(string playerID)
         {
