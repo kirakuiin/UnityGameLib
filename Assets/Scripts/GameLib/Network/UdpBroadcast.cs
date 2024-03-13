@@ -20,7 +20,7 @@ namespace GameLib.Network
     /// 提供广播发送功能。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class BroadcastSender<T> where T : struct
+    public class BroadcastSender<T> : Disposable where T : struct
     {
         private readonly UdpClient _udpSender = new(Address.DefaultIPEndPoint);
 
@@ -67,13 +67,20 @@ namespace GameLib.Network
             var data = SerializeTool.Serialize(message);
             return _udpSender.Send(data, data.Length, _endPoint);
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (IsDisposed) return;
+            IsDisposed = true;
+            _udpSender?.Dispose();
+        }
     }
 
     /// <summary>
     /// 提供接受Udp广播功能。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class BroadcastReceiver<T> where T : struct
+    public class BroadcastReceiver<T> : Disposable where T : struct
     {
         private readonly UdpClient _udpReceiver;
 
@@ -95,6 +102,13 @@ namespace GameLib.Network
         {
             return await _udpReceiver.ReceiveAsync();
         }
+        
+        protected override void Dispose(bool isDisposing)
+        {
+            if (IsDisposed) return;
+            IsDisposed = true;
+            _udpReceiver?.Dispose();
+        }
 
     }
     
@@ -102,7 +116,7 @@ namespace GameLib.Network
     /// 提供定时发出广播的功能。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class TimedBroadcaster<T> where T : struct
+    public class TimedBroadcaster<T> : Disposable where T : struct
     {
         private readonly BroadcastSender<T> _sender;
 
@@ -162,13 +176,21 @@ namespace GameLib.Network
                 _tasks.Dequeue().IsRunning = false;
             }
         }
+        
+        protected override void Dispose(bool isDisposing)
+        {
+            if (IsDisposed) return;
+            IsDisposed = true;
+            StopBroadcast();
+            _sender?.Dispose();
+        }
     }
 
     /// <summary>
     /// 提供不断接受广播的功能。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class BroadcastListener<T> where T : struct
+    public class BroadcastListener<T> : Disposable where T : struct
     {
         private readonly BroadcastReceiver<T> _receiver;
 
@@ -213,6 +235,14 @@ namespace GameLib.Network
             {
                 _tasks.Dequeue().IsRunning = false;
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (IsDisposed) return;
+            IsDisposed = true;
+            StopListen();
+            _receiver?.Dispose();
         }
 
         /// <summary>

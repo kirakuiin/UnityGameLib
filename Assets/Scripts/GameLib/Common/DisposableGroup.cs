@@ -4,12 +4,29 @@ using System.Collections.Generic;
 namespace GameLib.Common
 {
     /// <summary>
+    /// 通用资源管理抽象类，实现基础的资源管理。
+    /// </summary>
+    public abstract class Disposable : IDisposable
+    {
+        protected bool IsDisposed = false;
+        
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        /// <summary>
+        /// 实现释放资源接口。
+        /// </summary>
+        /// <param name="isDisposing">是否由用户主动调用。</param>
+        protected abstract void Dispose(bool isDisposing);
+    }
+    
+    /// <summary>
     /// 管理多个可处理对象的组，对象终结时会负责内部内容的释放。
     /// </summary>
-    public class DisposableGroup : IDisposable
+    public class DisposableGroup : Disposable
     {
-        private bool _isDisposed = false;
-
         private readonly List<IDisposable> _container = new();
 
         /// <summary>
@@ -27,14 +44,10 @@ namespace GameLib.Common
             GC.SuppressFinalize(this);
         }
         
-        public void Dispose()
+        protected override void Dispose(bool isDisposing)
         {
-            Dispose(true);
-        }
-        
-        protected virtual void Dispose(bool isDisposing)
-        {
-            if (_isDisposed) return;
+            if (IsDisposed) return;
+            IsDisposed = true;
 
             foreach (var element in _container)
             {
@@ -42,7 +55,6 @@ namespace GameLib.Common
             }
             
             _container.Clear();
-            _isDisposed = true;
         }
     }
 }

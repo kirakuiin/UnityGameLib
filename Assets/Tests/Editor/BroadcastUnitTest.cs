@@ -21,8 +21,9 @@ namespace Tests.Editor
     [TestFixture]
     public class BroadcastUnitTest
     {
-        private readonly TimedBroadcaster<Message> _sender = new();
-        private readonly BroadcastListener<Message> _receiver = new();
+        private const ushort Port = 13131;
+        private readonly TimedBroadcaster<Message> _sender = new(Port);
+        private readonly BroadcastListener<Message> _receiver = new(Port);
         private readonly Message _sentMsg = new () {value = 1, name = "hello"};
 
         [OneTimeSetUp]
@@ -38,6 +39,8 @@ namespace Tests.Editor
         {
             _receiver.StopListen();
             _sender.StopBroadcast();
+            _receiver.Dispose();
+            _sender.Dispose();
         }
 
         void OnReceivedBroadcast(IPAddress addr, Message msg)
@@ -73,6 +76,33 @@ namespace Tests.Editor
             _sender.StopBroadcast();
             
             Assert.IsFalse(_sender.IsSending);
+        }
+
+        [Test]
+        public void TestReceiverDispose()
+        {
+            const ushort port = 1241;
+
+            var listener = new BroadcastListener<Message>(port);
+            listener.StartListen();
+            listener.Dispose();
+            listener = new BroadcastListener<Message>(port);
+            listener.StartListen();
+            listener.Dispose();
+        }
+        
+
+        [Test]
+        public void TestSenderDispose()
+        {
+            const ushort port = 1245;
+
+            var sender = new TimedBroadcaster<Message>(port);
+            sender.StartBroadcast(_sentMsg);
+            sender.Dispose();
+            sender = new TimedBroadcaster<Message>(port);
+            sender.StartBroadcast(_sentMsg);
+            sender.Dispose();
         }
     }
 }
