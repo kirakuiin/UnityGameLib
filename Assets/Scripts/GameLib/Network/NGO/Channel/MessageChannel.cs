@@ -145,7 +145,7 @@ namespace GameLib.Network.NGO.Channel
             if (_isDisposed) return;
             
             _isDisposed = true;
-            if (_channel.IsDisposed)
+            if (!_channel.IsDisposed)
             {
                 _channel.Unsubscribe(_handler);
             }
