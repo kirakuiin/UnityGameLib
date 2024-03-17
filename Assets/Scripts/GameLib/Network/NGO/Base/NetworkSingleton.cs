@@ -74,5 +74,16 @@ namespace GameLib.Network.NGO
         public virtual void Clear()
         {
         }
+
+        /// <summary>
+        /// 销毁对象。
+        /// </summary>
+        public static void Destroy()
+        {
+            if (_instance is null) return;
+            
+            _instance.Clear();
+            _instance = default;
+        }
     }
 }

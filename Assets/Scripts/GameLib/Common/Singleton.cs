@@ -232,7 +232,7 @@ namespace GameLib.Common
             if (_instance == null) return;
 
             _instance.Clear();
-            _instance = default(T);
+            _instance = default;
         }
 
         public virtual void Clear()

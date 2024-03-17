@@ -100,13 +100,7 @@ namespace GameLib.Network.NGO
 
         public override void OnNetworkDespawn()
         {
-            foreach (var prefab in _prefabs)
-            {
-                NetworkManager.Singleton.PrefabHandler.RemoveHandler(prefab);
-                _pooledObjects[prefab].Clear();
-            }
-            _pooledObjects.Clear();
-            _prefabs.Clear();
+            Destroy();
         }
 
         public void OnValidate()
@@ -149,6 +143,17 @@ namespace GameLib.Network.NGO
         public void ReturnNetworkObject(NetworkObject networkObject, GameObject prefab)
         {
             _pooledObjects[prefab].Release(networkObject);
+        }
+
+        public override void Clear()
+        {
+            foreach (var prefab in _prefabs)
+            {
+                NetworkManager.Singleton.PrefabHandler.RemoveHandler(prefab);
+                _pooledObjects[prefab].Clear();
+            }
+            _pooledObjects.Clear();
+            _prefabs.Clear();
         }
     }
 
