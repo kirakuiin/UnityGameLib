@@ -85,5 +85,10 @@ namespace GameLib.Network.NGO
             _instance.Clear();
             _instance = default;
         }
+
+        public override void OnNetworkDespawn()
+        {
+            Destroy();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace GameLib.Common
 {
@@ -237,6 +238,11 @@ namespace GameLib.Common
 
         public virtual void Clear()
         {
+        }
+
+        protected virtual void OnDestroy()
+        {
+            Destroy();
         }
     }
 
