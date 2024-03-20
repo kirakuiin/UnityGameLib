@@ -46,6 +46,7 @@ namespace GameLib.UI
         [ExecuteAlways]
         void Update()
         {
+            if (Application.isPlaying) return;
             UpdateCellSize();
         }
 #endif
