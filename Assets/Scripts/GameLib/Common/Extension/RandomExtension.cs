@@ -27,5 +27,37 @@ namespace GameLib.Common.Extension
                 list.Swap(randIndex, i);
             }
         }
+        
+        /// <summary>
+        /// 在序列中随机采样若干个样本。
+        /// </summary>
+        /// <remarks>使用水塘抽样算法实现。</remarks>
+        /// <param name="random"></param>
+        /// <param name="sequence">序列</param>
+        /// <param name="k">提取的样本数</param>
+        /// <typeparam name="T"></typeparam>
+        public static IList<T> Sample<T>(this Random random, IEnumerable<T> sequence, int k)
+        {
+            var result = new List<T>();
+            var i = 0;
+            foreach (var elem in sequence)
+            {
+                i += 1;
+                if (i <= k)
+                {
+                    result.Add(elem);
+                }
+                else
+                {
+                    var j = random.Next(0, i);
+                    if (j < k)
+                    {
+                        result[j] = elem;
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }
