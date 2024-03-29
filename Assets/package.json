@@ -8,7 +8,8 @@
 	"keywords": [ "Networking", "Utils", "Extensions" ],
     "dependencies": {
         "com.unity.netcode.gameobjects": "1.7.1",
-        "com.unity.test-framework": "1.1.33"
+        "com.unity.test-framework": "1.1.33",
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
     },
     "author": {
         "name": "wang.zhuowei",
