@@ -12,7 +12,7 @@ namespace GameLib.Network.NGO
     /// <summary>
     /// 网络同步事件。
     /// </summary>
-    public class NetSyncEvent : INetworkSerializable
+    public struct NetSyncEvent : INetworkSerializable
     {
         /// <summary>
         /// 事件ID代表一个唯一事件。

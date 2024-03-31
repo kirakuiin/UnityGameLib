@@ -30,7 +30,7 @@ namespace GameLib.Common
 
         public override string ToString()
         {
-            return $"本地同步事件{Name}";
+            return $"本地同步事件[{Name}]";
         }
     }
     
