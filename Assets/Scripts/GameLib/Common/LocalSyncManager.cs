@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 namespace GameLib.Common
 {
-    public struct SyncEvent
+    public struct LocalSyncEvent
     {
         /// <summary>
         /// 事件ID代表一个唯一事件。
         /// </summary>
         public int EventID;
+        
+        public FixedString32Bytes Name;
 
         /// <summary>
         /// 通过枚举的形式创建事件。
@@ -17,14 +20,18 @@ namespace GameLib.Common
         /// <param name="val"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static SyncEvent Create<T>(T val) where T : Enum
+        public static LocalSyncEvent Create<T>(T val) where T : Enum
         {
-            return new SyncEvent() { EventID = val.GetHashCode() };
+            return new LocalSyncEvent()
+            {
+                EventID = val.GetHashCode(),
+                Name = $"{typeof(T).Name}.{val.ToString()}",
+            };
         }
 
         public override string ToString()
         {
-            return $"SyncEvent{EventID}";
+            return $"本地同步事件{Name}";
         }
     }
     
@@ -33,41 +40,41 @@ namespace GameLib.Common
     /// </summary>
     public class LocalSyncManager : Singleton<LocalSyncManager>
     {
-        private readonly Dictionary<SyncEvent, int> _eventCounter = new();
+        private readonly Dictionary<LocalSyncEvent, int> _eventCounter = new();
 
-        private readonly Dictionary<SyncEvent, Action<SyncEvent>> _eventAction = new();
+        private readonly Dictionary<LocalSyncEvent, Action<LocalSyncEvent>> _eventAction = new();
         
         /// <summary>
         /// 发起一个同步事件。
         /// </summary>
-        /// <param name="syncEvent"></param>
+        /// <param name="localSyncEvent"></param>
         /// <param name="needSyncNum"></param>
         /// <param name="onSyncDone"></param>
-        public void AddSyncEvent(SyncEvent syncEvent, int needSyncNum, Action<SyncEvent> onSyncDone=default)
+        public void AddSyncEvent(LocalSyncEvent localSyncEvent, int needSyncNum, Action<LocalSyncEvent> onSyncDone=default)
         {
-            Debug.Log($"添加同步事件{syncEvent}({needSyncNum})");
+            Debug.Log($"添加{localSyncEvent}(等待:{needSyncNum})");
 
-            _eventCounter[syncEvent] = needSyncNum;
-            _eventAction[syncEvent] = onSyncDone;
+            _eventCounter[localSyncEvent] = needSyncNum;
+            _eventAction[localSyncEvent] = onSyncDone;
         }
 
         /// <summary>
         /// 通报同步成功。
         /// </summary>
-        /// <param name="syncEvent"></param>
-        public void SyncDone(SyncEvent syncEvent)
+        /// <param name="localSyncEvent"></param>
+        public void SyncDone(LocalSyncEvent localSyncEvent)
         {
-            if (!_eventCounter.ContainsKey(syncEvent))
+            if (!_eventCounter.ContainsKey(localSyncEvent))
             {
-                Debug.Log($"同步不存在事件{syncEvent}。");
+                Debug.Log($"同步不存在{localSyncEvent}。");
                 return;
             }
             
-            _eventCounter[syncEvent] -= 1;
-            Debug.Log($"同步事件{syncEvent}。");
-            if (IsSyncComplete(syncEvent))
+            _eventCounter[localSyncEvent] -= 1;
+            Debug.Log($"同步{localSyncEvent}。");
+            if (IsSyncComplete(localSyncEvent))
             {
-                SyncComplete(syncEvent);
+                SyncComplete(localSyncEvent);
             }
             
         }
@@ -75,18 +82,18 @@ namespace GameLib.Common
         /// <summary>
         /// 查询事件是否同步完毕。
         /// </summary>
-        /// <param name="syncEvent"></param>
+        /// <param name="localSyncEvent"></param>
         /// <returns></returns>
-        public bool IsSyncComplete(SyncEvent syncEvent)
+        public bool IsSyncComplete(LocalSyncEvent localSyncEvent)
         {
-            return _eventCounter.TryGetValue(syncEvent, out var value) && value <= 0;
+            return _eventCounter.TryGetValue(localSyncEvent, out var value) && value <= 0;
         }
 
-        private void SyncComplete(SyncEvent syncEvent)
+        private void SyncComplete(LocalSyncEvent localSyncEvent)
         {
-            Debug.Log($"事件{syncEvent}全部同步完毕。");
-            _eventAction[syncEvent]?.Invoke(syncEvent);
-            _eventAction.Remove(syncEvent);
+            Debug.Log($"{localSyncEvent}全部同步完毕。");
+            _eventAction[localSyncEvent]?.Invoke(localSyncEvent);
+            _eventAction.Remove(localSyncEvent);
         }
     }
 }

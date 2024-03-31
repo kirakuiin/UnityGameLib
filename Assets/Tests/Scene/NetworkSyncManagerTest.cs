@@ -30,12 +30,12 @@ namespace Tests.Scene
         {
             if (GUILayout.Button("发送事件1"))
             {
-                NetworkSyncManager.Instance.AddSyncEvent(SyncEvent.Create(EventType.Event1),
+                NetworkSyncManager.Instance.AddSyncEvent(NetSyncEvent.Create(EventType.Event1),
                     (e) => Debug.Log($"{e}完毕"));
             }
             if (GUILayout.Button("发送事件2"))
             {
-                NetworkSyncManager.Instance.AddSyncEvent(SyncEvent.Create(EventType.Event2),
+                NetworkSyncManager.Instance.AddSyncEvent(NetSyncEvent.Create(EventType.Event2),
                     (e) => Debug.Log($"{e}完毕"));
             }
         }
@@ -44,11 +44,11 @@ namespace Tests.Scene
         {
             if (GUILayout.Button("事件1完毕"))
             {
-                NetworkSyncManager.Instance.SyncDone(SyncEvent.Create(EventType.Event1));
+                NetworkSyncManager.Instance.SyncDone(NetSyncEvent.Create(EventType.Event1));
             }
             if (GUILayout.Button("事件2完毕"))
             {
-                NetworkSyncManager.Instance.SyncDone(SyncEvent.Create(EventType.Event2));
+                NetworkSyncManager.Instance.SyncDone(NetSyncEvent.Create(EventType.Event2));
             }
         }
 

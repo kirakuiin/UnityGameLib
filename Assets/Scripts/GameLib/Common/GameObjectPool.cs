@@ -56,13 +56,14 @@ namespace GameLib.Common
                 CreateFunc, ActionOnGet, ActionOnRelease, ActionOnDestroy);
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             foreach (var prefab in _pooledObjects.Keys)
             {
                 _pooledObjects[prefab].Clear();
             }
             _pooledObjects.Clear();
+            base.OnDestroy();
         }
 
 
