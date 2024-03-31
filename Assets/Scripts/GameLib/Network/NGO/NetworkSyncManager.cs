@@ -32,24 +32,23 @@ namespace GameLib.Network.NGO
     }
     
     /// <summary>
-    /// 服务器用来同步多个客户端的各种进度事件。需要被继承来确定其具体类型。
+    /// 用来同步网络进度的管理器。
     /// </summary>
-    public class ProgressSyncManager : NetworkSingleton<ProgressSyncManager>
+    public class NetworkSyncManager : NetworkSingleton<NetworkSyncManager>
     {
         private readonly Dictionary<SyncEvent, Counter<ulong>> _eventCounter = new();
 
         private readonly Dictionary<SyncEvent, Action<SyncEvent>> _eventAction = new();
         
         /// <summary>
-        /// 服务端发起一个进度同步事件，当所有客户端都同步之后触发注册的回调函数。
+        /// 发起一个网络间进度同步事件。
         /// </summary>
         /// <param name="syncEvent"></param>
         /// <param name="onSyncDone"></param>
-        public void AddSyncEvent(SyncEvent syncEvent, Action<SyncEvent> onSyncDone)
+        public void AddSyncEvent(SyncEvent syncEvent, Action<SyncEvent> onSyncDone=default)
         {
             if (!NetworkManager.IsServer || !IsSpawned) return;
-            if (_eventCounter.ContainsKey(syncEvent)) return;
-            Debug.Log($"添加同步事件{syncEvent}");
+            Debug.Log($"添加网络同步事件{syncEvent}");
 
             _eventCounter[syncEvent] = new Counter<ulong>();
             _eventAction[syncEvent] = onSyncDone;
@@ -59,15 +58,15 @@ namespace GameLib.Network.NGO
         /// 客户端通报客户端同步成功。
         /// </summary>
         /// <param name="syncEvent"></param>
-        public void ClientSyncDone(SyncEvent syncEvent)
+        public void SyncDone(SyncEvent syncEvent)
         {
             if (!NetworkManager.IsClient || !IsSpawned) return;
             Debug.Log($"客户端{NetworkManager.LocalClientId}发起{syncEvent}同步。");
-            ClientSyncDoneServerRpc(syncEvent);
+            SyncDoneServerRpc(syncEvent);
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void ClientSyncDoneServerRpc(SyncEvent syncEvent, ServerRpcParams param=default)
+        private void SyncDoneServerRpc(SyncEvent syncEvent, ServerRpcParams param=default)
         {
             var clientID = param.Receive.SenderClientId;
             if (!_eventCounter.ContainsKey(syncEvent))
@@ -78,26 +77,32 @@ namespace GameLib.Network.NGO
             
             _eventCounter[syncEvent][clientID] += 1;
             Debug.Log($"客户端{clientID}同步事件{syncEvent}完毕。");
-            if (CheckSyncDone(syncEvent))
+            if (IsSyncComplete(syncEvent))
             {
-                SyncDone(syncEvent);
+                SyncComplete(syncEvent);
             }
         }
 
-        private bool CheckSyncDone(SyncEvent syncEvent)
+        /// <summary>
+        /// 查询事件是否同步完毕。
+        /// </summary>
+        /// <param name="syncEvent"></param>
+        /// <returns></returns>
+        public bool IsSyncComplete(SyncEvent syncEvent)
         {
+            if (!_eventCounter.ContainsKey(syncEvent)) return false;
             var counter = _eventCounter[syncEvent];
             var syncResult = from id in NetworkManager.ConnectedClientsIds
                 select counter.ContainsKey(id);
             return syncResult.All(val => val);
         }
 
-        private void SyncDone(SyncEvent syncEvent)
+        private void SyncComplete(SyncEvent syncEvent)
         {
             Debug.Log($"事件{syncEvent}全部同步完毕。");
             _eventAction[syncEvent]?.Invoke(syncEvent);
-            _eventCounter.Remove(syncEvent);
             _eventAction.Remove(syncEvent);
         }
     }
+
 }
