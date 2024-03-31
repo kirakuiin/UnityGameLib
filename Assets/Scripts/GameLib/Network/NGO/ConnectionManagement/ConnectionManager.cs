@@ -81,15 +81,18 @@ namespace GameLib.Network.NGO.ConnectionManagement
             _currentState.OnTransportFailure();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
-            if (NetworkManager.Singleton is null) return;
-            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
-            NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
-            NetworkManager.Singleton.OnServerStopped -= OnServerStopped;
-            NetworkManager.Singleton.ConnectionApprovalCallback -= OnApproveCheck;
-            NetworkManager.Singleton.OnTransportFailure -= OnTransportFailure;
+            if (NetworkManager.Singleton != null)
+            {
+                NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+                NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
+                NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
+                NetworkManager.Singleton.OnServerStopped -= OnServerStopped;
+                NetworkManager.Singleton.ConnectionApprovalCallback -= OnApproveCheck;
+                NetworkManager.Singleton.OnTransportFailure -= OnTransportFailure;
+            }
+            base.OnDestroy();
         }
 
         /// <summary>

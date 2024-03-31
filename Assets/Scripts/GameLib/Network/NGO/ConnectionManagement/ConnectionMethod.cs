@@ -100,9 +100,10 @@ namespace GameLib.Network.NGO.ConnectionManagement
             _endPoint = endPoint;
         }
         
-        public override async Task SetupHostConnectionAsync()
+        public override Task SetupHostConnectionAsync()
         {
             CommonSetup();
+            return Task.CompletedTask;
         }
 
         private void CommonSetup()
@@ -112,13 +113,15 @@ namespace GameLib.Network.NGO.ConnectionManagement
             utp.SetConnectionData(_endPoint.Address.ToString(), (ushort)_endPoint.Port);
         }
 
-        public override async Task SetupClientConnectionAsync()
+        public override Task SetupClientConnectionAsync()
         {
             CommonSetup();
+            return Task.CompletedTask;
         }
 
         public override async Task<ReconnectResult> SetupClientReconnectAsync()
         {
+            await Task.CompletedTask;
             return new ReconnectResult() { IsSuccess = true, ShouldTryAgain = true };
         }
     }
