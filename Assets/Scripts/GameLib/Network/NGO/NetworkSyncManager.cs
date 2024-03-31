@@ -5,20 +5,27 @@ using GameLib.Common.DataStructure;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace GameLib.Network.NGO
 {
     /// <summary>
     /// 网络同步事件。
     /// </summary>
-    public struct NetSyncEvent : INetworkSerializeByMemcpy
+    public class NetSyncEvent : INetworkSerializable
     {
         /// <summary>
         /// 事件ID代表一个唯一事件。
         /// </summary>
         public int EventID;
 
-        public FixedString32Bytes Name;
+        public String Name;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref EventID);
+            serializer.SerializeValue(ref Name);
+        }
 
         /// <summary>
         /// 通过枚举的形式创建事件。

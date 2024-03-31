@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Unity.Collections;
 using UnityEngine;
 
 namespace GameLib.Common
@@ -12,7 +11,7 @@ namespace GameLib.Common
         /// </summary>
         public int EventID;
         
-        public FixedString32Bytes Name;
+        public String Name;
 
         /// <summary>
         /// 通过枚举的形式创建事件。
