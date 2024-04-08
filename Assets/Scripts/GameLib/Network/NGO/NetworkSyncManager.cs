@@ -55,30 +55,22 @@ namespace GameLib.Network.NGO
         }
 
         /// <summary>
-        /// 重置一个事件计数。
+        /// 重置全部事件(仅服务器)。
         /// </summary>
-        /// <param name="e"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public void ResetEvent<T>(T e) where T : Enum
+        public void ResetAll()
         {
-            Debug.Log($"重置网络同步事件{e}");
-            var eventKey = EventToStr(e);
-            if (_syncResult.ContainsKey(eventKey))
-            {
-                _syncResult.Remove(eventKey);
-                _callbackContainer.Remove(eventKey);
-            }
-            ResetEventServerRpc(eventKey);
+            if (!IsServer) return;
+            Debug.Log($"重置全部网络同步事件");
+            _eventCollections.Clear();
+            ResetAllClientRpc();
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void ResetEventServerRpc(string eventKey)
+        [ClientRpc]
+        private void ResetAllClientRpc()
         {
-            if (_eventCollections.ContainsKey(eventKey))
-            {
-                _eventCollections.Remove(eventKey);
-            }
+            _pendingEvents.Clear();
+            _callbackContainer.Clear();
+            _syncResult.Clear();
         }
 
         public override void OnNetworkSpawn()

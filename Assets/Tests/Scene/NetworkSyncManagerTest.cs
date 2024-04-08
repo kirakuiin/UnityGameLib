@@ -36,9 +36,9 @@ namespace Tests.Scene
             {
                 NetworkSyncManager.Instance.AddSyncEvent(EventType.Event2, () => Debug.Log("事件2结束"));
             }
-            if (GUILayout.Button("重置事件2"))
+            if (GUILayout.Button("重置全部"))
             {
-                NetworkSyncManager.Instance.ResetEvent(EventType.Event2);
+                NetworkSyncManager.Instance.ResetAll();
             }
         }
 
@@ -51,10 +51,6 @@ namespace Tests.Scene
             if (GUILayout.Button("事件2完毕"))
             {
                 NetworkSyncManager.Instance.AddSyncEvent(EventType.Event2);
-            }
-            if (GUILayout.Button("重置事件1"))
-            {
-                NetworkSyncManager.Instance.ResetEvent(EventType.Event1);
             }
         }
 
