@@ -30,13 +30,15 @@ namespace Tests.Scene
         {
             if (GUILayout.Button("发送事件1"))
             {
-                NetworkSyncManager.Instance.AddSyncEvent(NetSyncEvent.Create(EventType.Event1),
-                    (e) => Debug.Log($"{e}完毕"));
+                NetworkSyncManager.Instance.AddSyncEvent(EventType.Event1);
             }
             if (GUILayout.Button("发送事件2"))
             {
-                NetworkSyncManager.Instance.AddSyncEvent(NetSyncEvent.Create(EventType.Event2),
-                    (e) => Debug.Log($"{e}完毕"));
+                NetworkSyncManager.Instance.AddSyncEvent(EventType.Event2, () => Debug.Log("事件2结束"));
+            }
+            if (GUILayout.Button("重置事件2"))
+            {
+                NetworkSyncManager.Instance.ResetEvent(EventType.Event2);
             }
         }
 
@@ -44,11 +46,15 @@ namespace Tests.Scene
         {
             if (GUILayout.Button("事件1完毕"))
             {
-                NetworkSyncManager.Instance.SyncDone(NetSyncEvent.Create(EventType.Event1));
+                NetworkSyncManager.Instance.AddSyncEvent(EventType.Event1, () => Debug.Log("事件1结束"));
             }
             if (GUILayout.Button("事件2完毕"))
             {
-                NetworkSyncManager.Instance.SyncDone(NetSyncEvent.Create(EventType.Event2));
+                NetworkSyncManager.Instance.AddSyncEvent(EventType.Event2);
+            }
+            if (GUILayout.Button("重置事件1"))
+            {
+                NetworkSyncManager.Instance.ResetEvent(EventType.Event1);
             }
         }
 

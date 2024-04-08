@@ -1,124 +1,152 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using GameLib.Common.DataStructure;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace GameLib.Network.NGO
 {
+
     /// <summary>
-    /// 网络同步事件。
-    /// </summary>
-    public struct NetSyncEvent : INetworkSerializable
-    {
-        /// <summary>
-        /// 事件ID代表一个唯一事件。
-        /// </summary>
-        public int EventID;
-
-        public String Name;
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref EventID);
-            serializer.SerializeValue(ref Name);
-        }
-
-        /// <summary>
-        /// 通过枚举的形式创建事件。
-        /// </summary>
-        /// <param name="val"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static NetSyncEvent Create<T>(T val) where T : Enum
-        {
-            return new NetSyncEvent()
-            {
-                EventID = val.GetHashCode(),
-                Name = $"{typeof(T).Name}.{val.ToString()}",
-            };
-        }
-
-        public override string ToString()
-        {
-            return $"网络同步事件[{Name}]";
-        }
-    }
-    
-    /// <summary>
-    /// 用来同步网络进度的管理器。
+    /// 网络事件同步管理器。
+    /// 当每个客户端都发出过同步请求之后，视为整个事件同步完毕。
     /// </summary>
     public class NetworkSyncManager : NetworkSingleton<NetworkSyncManager>
     {
-        private readonly Dictionary<NetSyncEvent, Counter<ulong>> _eventCounter = new();
+        struct EventInfo
+        {
+            public string EventKey;
+            public Action OnDone;
+        }
 
-        private readonly Dictionary<NetSyncEvent, Action<NetSyncEvent>> _eventAction = new();
+        private readonly Queue<EventInfo> _pendingEvents = new ();
+        private readonly Dictionary<string, Action> _callbackContainer = new();
+        private readonly Dictionary<string, bool> _syncResult = new();
+        
+        // 服务器专用。
+        private readonly Dictionary<string, HashSet<ulong>> _eventCollections = new();
         
         /// <summary>
-        /// 发起一个网络间进度同步事件。
+        /// 添加一个带完毕回调的同步事件。
         /// </summary>
-        /// <param name="netSyncEvent"></param>
-        /// <param name="onSyncDone"></param>
-        public void AddSyncEvent(NetSyncEvent netSyncEvent, Action<NetSyncEvent> onSyncDone=default)
+        /// <param name="e"></param>
+        /// <param name="onDone"></param>
+        /// <typeparam name="T"></typeparam>
+        public void AddSyncEvent<T>(T e, Action onDone=default) where T : Enum
         {
-            if (!NetworkManager.IsServer || !IsSpawned) return;
-            Debug.Log($"添加{netSyncEvent}");
-
-            _eventCounter[netSyncEvent] = new Counter<ulong>();
-            _eventAction[netSyncEvent] = onSyncDone;
+            Debug.Log($"添加网络同步事件{e}");
+            _pendingEvents.Enqueue(new EventInfo() {EventKey = EventToStr(e), OnDone = onDone});
+        }
+        
+        private string EventToStr<T>(T e) where T : Enum
+        {
+            return $"{typeof(T).FullName}|{e.GetHashCode()}";
         }
 
         /// <summary>
-        /// 客户端通报客户端同步成功。
+        /// 查询某个事件是否同步完毕。
         /// </summary>
-        /// <param name="netSyncEvent"></param>
-        public void SyncDone(NetSyncEvent netSyncEvent)
+        /// <param name="e"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public bool HasBeenSyncDone<T>(T e) where T : Enum
         {
-            if (!NetworkManager.IsClient || !IsSpawned) return;
-            Debug.Log($"客户端{NetworkManager.LocalClientId}开始同步{netSyncEvent}。");
-            SyncDoneServerRpc(netSyncEvent);
+            var eventKey = EventToStr(e);
+            return _syncResult.ContainsKey(eventKey) && _syncResult[eventKey];
+        }
+
+        /// <summary>
+        /// 重置一个事件计数。
+        /// </summary>
+        /// <param name="e"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public void ResetEvent<T>(T e) where T : Enum
+        {
+            Debug.Log($"重置网络同步事件{e}");
+            var eventKey = EventToStr(e);
+            if (_syncResult.ContainsKey(eventKey))
+            {
+                _syncResult.Remove(eventKey);
+                _callbackContainer.Remove(eventKey);
+            }
+            ResetEventServerRpc(eventKey);
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void SyncDoneServerRpc(NetSyncEvent netSyncEvent, ServerRpcParams param=default)
+        private void ResetEventServerRpc(string eventKey)
         {
-            var clientID = param.Receive.SenderClientId;
-            if (!_eventCounter.ContainsKey(netSyncEvent))
+            if (_eventCollections.ContainsKey(eventKey))
             {
-                Debug.Log($"客户端{clientID}同步不存在的{netSyncEvent}。");
-                return;
-            }
-            
-            _eventCounter[netSyncEvent][clientID] += 1;
-            Debug.Log($"客户端{clientID}同步{netSyncEvent}完毕。");
-            if (IsSyncComplete(netSyncEvent))
-            {
-                SyncComplete(netSyncEvent);
+                _eventCollections.Remove(eventKey);
             }
         }
 
-        /// <summary>
-        /// 查询事件是否同步完毕。
-        /// </summary>
-        /// <param name="netSyncEvent"></param>
-        /// <returns></returns>
-        public bool IsSyncComplete(NetSyncEvent netSyncEvent)
+        public override void OnNetworkSpawn()
         {
-            if (!_eventCounter.ContainsKey(netSyncEvent)) return false;
-            var counter = _eventCounter[netSyncEvent];
-            var syncResult = from id in NetworkManager.ConnectedClientsIds
-                select counter.ContainsKey(id);
-            return syncResult.All(val => val);
+            if (IsServer)
+            {
+                NetworkManager.OnClientDisconnectCallback += RecheckEvent;
+            }
         }
 
-        private void SyncComplete(NetSyncEvent netSyncEvent)
+        private void RecheckEvent(ulong clientID)
         {
-            Debug.Log($"{netSyncEvent}全部同步完毕。");
-            _eventAction[netSyncEvent]?.Invoke(netSyncEvent);
-            _eventAction.Remove(netSyncEvent);
+            Debug.Log("触发重新检查");
+            var curConnectedIds = new List<ulong>(NetworkManager.ConnectedClientsIds);
+            curConnectedIds.Remove(clientID);
+            foreach (var eventKey in _eventCollections.Keys)
+            {
+                CheckSync(eventKey, curConnectedIds);
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (NetworkManager && IsServer)
+            {
+                NetworkManager.OnClientDisconnectCallback -= RecheckEvent;
+            }
+        }
+
+        private void Update()
+        {
+            while (_pendingEvents.Count > 0 && IsSpawned)
+            {
+                var eventInfo = _pendingEvents.Dequeue();
+                _callbackContainer[eventInfo.EventKey] = eventInfo.OnDone;
+                _syncResult.TryAdd(eventInfo.EventKey, false);
+                SyncEventServerRpc(eventInfo.EventKey);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SyncEventServerRpc(string eventKey, ServerRpcParams rpcParams=default)
+        {
+            UpdateEvent(eventKey, rpcParams.Receive.SenderClientId);
+        }
+
+        private void UpdateEvent(string eventKey, ulong clientID)
+        {
+            _eventCollections.TryAdd(eventKey, new HashSet<ulong>());
+            _eventCollections[eventKey].Add(clientID);
+            CheckSync(eventKey, NetworkManager.ConnectedClientsIds);
+        }
+
+        private void CheckSync(string eventKey, IEnumerable<ulong> curConnectedIds)
+        {
+            if (_eventCollections[eventKey].IsSupersetOf(curConnectedIds))
+            {
+                SyncCompleteClientRpc(eventKey);
+            }
+        }
+
+        [ClientRpc]
+        private void SyncCompleteClientRpc(string eventKey)
+        {
+            Debug.Log($"网络同步事件{eventKey}完毕");
+            _syncResult[eventKey] = true;
+            _callbackContainer[eventKey]?.Invoke();
+            _callbackContainer[eventKey] = null;
         }
     }
 

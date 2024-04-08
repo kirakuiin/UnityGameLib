@@ -226,7 +226,7 @@ GameObject:
   - component: {fileID: 242192463}
   - component: {fileID: 242192462}
   m_Layer: 0
-  m_Name: ProgressSyncTest
+  m_Name: NetworkSyncTest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

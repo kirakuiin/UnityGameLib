@@ -4,76 +4,53 @@ using UnityEngine;
 
 namespace GameLib.Common
 {
-    public struct LocalSyncEvent
-    {
-        /// <summary>
-        /// 事件ID代表一个唯一事件。
-        /// </summary>
-        public int EventID;
-        
-        public String Name;
-
-        /// <summary>
-        /// 通过枚举的形式创建事件。
-        /// </summary>
-        /// <param name="val"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static LocalSyncEvent Create<T>(T val) where T : Enum
-        {
-            return new LocalSyncEvent()
-            {
-                EventID = val.GetHashCode(),
-                Name = $"{typeof(T).Name}.{val.ToString()}",
-            };
-        }
-
-        public override string ToString()
-        {
-            return $"本地同步事件[{Name}]";
-        }
-    }
-    
     /// <summary>
     /// 管理本地的进度同步事件。
     /// </summary>
     public class LocalSyncManager : Singleton<LocalSyncManager>
     {
-        private readonly Dictionary<LocalSyncEvent, int> _eventCounter = new();
+        private readonly Dictionary<string, int> _eventCounter = new();
 
-        private readonly Dictionary<LocalSyncEvent, Action<LocalSyncEvent>> _eventAction = new();
+        private readonly Dictionary<string, Action> _eventAction = new();
         
         /// <summary>
-        /// 发起一个同步事件。
+        /// 发起一个本地同步事件。
         /// </summary>
-        /// <param name="localSyncEvent"></param>
+        /// <param name="e"></param>
         /// <param name="needSyncNum"></param>
         /// <param name="onSyncDone"></param>
-        public void AddSyncEvent(LocalSyncEvent localSyncEvent, int needSyncNum, Action<LocalSyncEvent> onSyncDone=default)
+        public void AddSyncEvent<T>(T e, int needSyncNum, Action onSyncDone=default) where T : Enum
         {
-            Debug.Log($"添加{localSyncEvent}(等待:{needSyncNum})");
+            Debug.Log($"添加本地事件{e}(等待:{needSyncNum})");
 
-            _eventCounter[localSyncEvent] = needSyncNum;
-            _eventAction[localSyncEvent] = onSyncDone;
+            var eventKey = EventToStr(e);
+            _eventCounter[eventKey] = needSyncNum;
+            _eventAction[eventKey] = onSyncDone;
+        }
+        
+        private string EventToStr<T>(T e) where T : Enum
+        {
+            return $"{typeof(T).FullName}|{e.GetHashCode()}";
         }
 
         /// <summary>
         /// 通报同步成功。
         /// </summary>
-        /// <param name="localSyncEvent"></param>
-        public void SyncDone(LocalSyncEvent localSyncEvent)
+        /// <param name="e"></param>
+        public void SyncDone<T>(T e) where T : Enum
         {
-            if (!_eventCounter.ContainsKey(localSyncEvent))
+            var eventKey = EventToStr(e);
+            if (!_eventCounter.ContainsKey(eventKey))
             {
-                Debug.Log($"同步不存在{localSyncEvent}。");
+                Debug.Log($"同步不存在事件{e}。");
                 return;
             }
             
-            _eventCounter[localSyncEvent] -= 1;
-            Debug.Log($"同步{localSyncEvent}。");
-            if (IsSyncComplete(localSyncEvent))
+            _eventCounter[eventKey] -= 1;
+            Debug.Log($"同步{e}。剩余{_eventCounter[eventKey]}");
+            if (HasBeenSyncDone(e))
             {
-                SyncComplete(localSyncEvent);
+                SyncComplete(e);
             }
             
         }
@@ -81,18 +58,20 @@ namespace GameLib.Common
         /// <summary>
         /// 查询事件是否同步完毕。
         /// </summary>
-        /// <param name="localSyncEvent"></param>
+        /// <param name="e"></param>
         /// <returns></returns>
-        public bool IsSyncComplete(LocalSyncEvent localSyncEvent)
+        public bool HasBeenSyncDone<T>(T e) where T : Enum
         {
-            return _eventCounter.TryGetValue(localSyncEvent, out var value) && value <= 0;
+            var eventKey = EventToStr(e);
+            return _eventCounter.ContainsKey(eventKey) && _eventCounter[eventKey] <= 0;
         }
 
-        private void SyncComplete(LocalSyncEvent localSyncEvent)
+        private void SyncComplete<T>(T e) where T : Enum
         {
-            Debug.Log($"{localSyncEvent}全部同步完毕。");
-            _eventAction[localSyncEvent]?.Invoke(localSyncEvent);
-            _eventAction.Remove(localSyncEvent);
+            Debug.Log($"{e}全部同步完毕。");
+            var eventKey = EventToStr(e);
+            _eventAction[eventKey]?.Invoke();
+            _eventAction[eventKey] = null;
         }
     }
 }
