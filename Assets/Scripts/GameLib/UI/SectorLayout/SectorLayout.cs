@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using System.Linq;
 using GameLib.Common.Extension;
+using GameLib.UI.Extension;
 
 namespace GameLib.UI.SectorLayout
 {
@@ -12,6 +13,10 @@ namespace GameLib.UI.SectorLayout
     [ExecuteInEditMode]
     public class SectorLayout : MonoBehaviour
     {
+        [Tooltip("每个对象的大小")]
+        [SerializeField]
+        private Vector2 cellSize;
+        
         [Tooltip("圆心位置")]
         [SerializeField]
         private float radius;
@@ -19,22 +24,53 @@ namespace GameLib.UI.SectorLayout
         [Tooltip("两个对象间角度间隔")]
         [SerializeField]
         private float angleInterval;
-
+        
+        [Tooltip("对象添加动画播放器")]
         [SerializeField]
         private SectorAnimator animator;
 
-        private Vector3 _origin;
+        [Tooltip("最小的顺序值")]
+        [SerializeField] private int minimumOrder = 1;
+        
+        private Vector3 Origin => transform.position - new Vector3(0, radius, 0);
 
-        private void Awake()
+        /// <summary>
+        /// 设置每个元素的大小。
+        /// </summary>
+        public Vector2 CellSize
         {
-            _origin = transform.position - new Vector3(0, radius, 0);
+            set
+            {
+                cellSize = value;
+                UpdateChildSize();
+            }
+            get => cellSize;
         }
+
+        /// <summary>
+        /// 重设间隔角度。
+        /// </summary>
+        /// <param name="angle"></param>
+        public void SetAngle(float angle)
+        {
+            angleInterval = angle;
+            Rebuild();
+        }
+
+        private void UpdateChildSize()
+        {
+            for (var i = 0; i < transform.childCount; ++i)
+            {
+                transform.GetChild(i).GetComponent<RectTransform>().SetRectSize(cellSize);
+            }
+        }
+        
 
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawSphere(_origin, 10f);
-            Gizmos.DrawWireSphere(_origin, radius);
+            Gizmos.DrawSphere(Origin, 10f);
+            Gizmos.DrawWireSphere(Origin, radius);
         }
 
 # if UNITY_EDITOR
@@ -42,17 +78,18 @@ namespace GameLib.UI.SectorLayout
         {
             if (Application.isPlaying) return;
             if (transform.childCount == 0) return;
+            var origin = Origin;
             for (var i = 0; i < transform.childCount; ++i)
             {
-                transform.GetChild(i).position = CalcChildPosition(i);
+                transform.GetChild(i).position = CalcChildPosition(i, origin);
                 transform.GetChild(i).rotation = CalcChildQuaternion(i);
             }
         }
 #endif
-        private Vector3 CalcChildPosition(int childIdx)
+        private Vector3 CalcChildPosition(int childIdx, Vector3 origin)
         {
             var targetRad = Mathf.Deg2Rad*CalcChildDegrees(childIdx);
-            return _origin + new Vector3(-Mathf.Sin(targetRad), Mathf.Cos(targetRad)) * radius;
+            return origin + new Vector3(-Mathf.Sin(targetRad), Mathf.Cos(targetRad)) * radius;
         }
 
         private float CalcChildDegrees(int childIdx)
@@ -69,13 +106,15 @@ namespace GameLib.UI.SectorLayout
         /// <summary>
         /// 增加一个子对象。
         /// </summary>
+        /// <remarks>如果对象实现了<see cref="GameLib.UI.CanvasDrawOrder"/>接口，那么会对其显示顺序进行自动排序。</remarks>
         /// <param name="childObj"></param>
         public void Add(GameObject childObj)
         {
             childObj.transform.SetParent(transform);
+            childObj.GetComponent<RectTransform>().SetRectSize(cellSize);
             Rebuild();
         }
-
+        
         /// <summary>
         /// 重新布局。
         /// </summary>
@@ -87,30 +126,37 @@ namespace GameLib.UI.SectorLayout
 
         private IEnumerator RebuildCoroutine()
         {
-            while (!IsAllUpdateDone())
+            var origin = Origin;
+            while (!HasBeenDone())
             {
                 for (var i = 0; i < transform.childCount; ++i)
                 {
-                    animator.Play(transform.GetChild(i), CalcChildPosition(i),
+                    var childTransform = transform.GetChild(i);
+                    animator.Play(childTransform, CalcChildPosition(i, origin),
                         CalcChildQuaternion(i));
+                    if (childTransform.gameObject.TryGetComponent<IDrawOrder>(out var comp))
+                    {
+                        comp.Order = i+minimumOrder;
+                    }
                 }
                 yield return null;
             }
         }
 
-        private bool IsAllUpdateDone()
+        private bool HasBeenDone()
         {
+            var origin = Origin;
             var query = from index in Enumerable.Range(0, transform.childCount)
                 select new
                 {
                     basePos = transform.GetChild(index).position,
                     baseRot = transform.GetChild(index).rotation,
-                    targetPos = CalcChildPosition(index),
+                    targetPos = CalcChildPosition(index, origin),
                     targetRot = CalcChildQuaternion(index)
                 }
                 into element
-                where !MathExtension.Approximately(element.basePos, element.targetPos, 1E-02f)
-                      || !MathExtension.Approximately(element.baseRot, element.targetRot, 1E-01F)
+                where !MathExtension.Approximately(element.basePos, element.targetPos, 1)
+                      || !MathExtension.Approximately(element.baseRot, element.targetRot, 1)
                 select element;
             
             var isAllDone = query.ToArray().Length == 0;
@@ -127,5 +173,6 @@ namespace GameLib.UI.SectorLayout
             Rebuild();
         }
     }
+
 
 }

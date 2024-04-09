@@ -3,13 +3,12 @@ using UnityEngine.UI;
 
 namespace GameLib.UI
 {
-
     /// <summary>
     /// 让GridLayoutGroup的CellSize属性可以自动适配父对象的大小。
     /// </summary>
     [ExecuteInEditMode]
     [RequireComponent(typeof(GridLayoutGroup))]
-    public class AutoGridSize: MonoBehaviour
+    public class GridCellSizeFitter: MonoBehaviour
     {
         private enum Axis { X, Y };
         private enum RatioMode { Free, Fixed };

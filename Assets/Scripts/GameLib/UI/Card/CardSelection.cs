@@ -1,13 +1,13 @@
-﻿using UnityEngine;
+﻿using GameLib.UI.SectorLayout;
+using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Rendering;
 
 namespace GameLib.UI.Card
 {
     /// <summary>
     /// 支持卡牌被选中时的一系列特效。
     /// </summary>
-    [RequireComponent(typeof(Canvas))]
+    [RequireComponent(typeof(IDrawOrder))]
     public class CardSelection : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField]
@@ -24,7 +24,7 @@ namespace GameLib.UI.Card
         
         private const int MaxOrder = 9999;
         
-        protected Canvas Sorter;
+        protected IDrawOrder CanvasDrawOrder;
 
         private Transform _transform;
 
@@ -36,14 +36,14 @@ namespace GameLib.UI.Card
 
         private void Awake()
         {
-            Sorter = GetComponent<Canvas>();
             _transform = transform;
+            CanvasDrawOrder = GetComponent<IDrawOrder>();
         }
 
         public virtual void OnPointerEnter(PointerEventData eventData)
         {
             SaveOriginInfo();
-            Sorter.sortingOrder = MaxOrder;
+            CanvasDrawOrder.Order = MaxOrder;
             _transform.localScale *= scaleFactor;
             _transform.position += moveOffset;
             if (isEnableRotation)
@@ -54,14 +54,14 @@ namespace GameLib.UI.Card
 
         protected virtual void SaveOriginInfo()
         {
-            _originOrder = Sorter.sortingOrder;
+            _originOrder = CanvasDrawOrder.Order;
             _originScale = _transform.localScale;
             _originRotation = _transform.rotation;
         }
 
         public virtual void OnPointerExit(PointerEventData eventData)
         {
-            Sorter.sortingOrder = _originOrder;
+            CanvasDrawOrder.Order = _originOrder;
             _transform.localScale = _originScale;
             _transform.position -= moveOffset;
             if (isEnableRotation)
