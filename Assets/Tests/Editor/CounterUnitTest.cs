@@ -101,5 +101,75 @@ namespace Tests.Editor
             Assert.AreEqual("world", _dict.MostCommon(3).Last().Key);
             Assert.AreEqual("x", _dict.MostCommon().Last().Key);
         }
+
+        [Test]
+        public void TestUpdate()
+        {
+            _dict["a"] = 3;
+            var newCounter = new Counter<string>
+            {
+                ["b"] = 4
+            };
+
+            _dict.Update(newCounter);
+            
+            Assert.AreEqual(4, _dict["b"]);
+            Assert.AreEqual(2, _dict.Count());
+        }
+
+        [Test]
+        public void TestSub()
+        {
+            _dict["a"] = 3;
+            var newCounter = new Counter<string>
+            {
+                ["b"] = 4,
+                ["a"] = 1
+            };
+
+            _dict.Subtract(newCounter);
+            
+            Assert.AreEqual(2, _dict["a"]);
+            Assert.AreEqual(2, _dict.Count());
+        }
+        
+
+        [Test]
+        public void TestSetOp()
+        {
+            _dict["a"] = 3;
+            var newCounter = new Counter<string>
+            {
+                ["b"] = 4,
+                ["a"] = 1
+            };
+
+            var c1 = _dict + newCounter;
+            var c2 = _dict - newCounter;
+            
+            Assert.AreEqual(2, c1.Count);
+            Assert.AreEqual(c1["a"], c1["b"]);
+            Assert.AreEqual(1, c2.Count);
+            Assert.AreEqual(2, c2["a"]);
+        }
+        
+        [Test]
+        public void TestCompare()
+        {
+            _dict = new Counter<string>
+            {
+                ["b"] = 6
+            };
+            var newCounter = new Counter<string>
+            {
+                ["b"] = 4,
+                ["a"] = -1
+            };
+
+            Assert.IsTrue(_dict > newCounter);
+            Assert.IsTrue(newCounter < _dict);
+            Assert.AreEqual(1, _dict.Count);
+            Assert.AreEqual(2, newCounter.Count);
+        }
     }
 }

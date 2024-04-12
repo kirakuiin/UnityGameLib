@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +10,7 @@ namespace GameLib.Common.DataStructure
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class Counter<T>
-    : IDictionary<T, long>, IReadOnlyDictionary<T, long>
+    : IDictionary<T, long>, IReadOnlyDictionary<T, long>, IEquatable<Counter<T>>
     {
         private readonly DefaultDict<T, long> _delegate;
 
@@ -23,6 +24,15 @@ namespace GameLib.Common.DataStructure
             foreach (var elem in sequence)
             {
                 _delegate[elem] += 1;
+            }
+        }
+
+        public Counter(Counter<T> other)
+            : this()
+        {
+            foreach (var pair in other)
+            {
+                _delegate[pair.Key] = pair.Value;
             }
         }
 
@@ -178,6 +188,105 @@ namespace GameLib.Common.DataStructure
                     yield return pair.Key;
                 }
             }
+        }
+
+        /// <summary>
+        /// 将另一个计数器的内容合并到自身。
+        /// </summary>
+        /// <param name="other"></param>
+        public void Update(Counter<T> other)
+        {
+            foreach (var pair in other)
+            {
+                _delegate[pair.Key] += pair.Value;
+            }
+        }
+
+        /// <summary>
+        /// 减去另一个计数器内的数值。
+        /// </summary>
+        /// <remarks>如果本身不存在某个键则会出现负数。</remarks>
+        public void Subtract(Counter<T> other)
+        {
+            foreach (var pair in other)
+            {
+                _delegate[pair.Key] -= pair.Value;
+            }
+        }
+
+        public static Counter<T> operator -(Counter<T> origin)
+        {
+            var result = new Counter<T>();
+            foreach (var pair in origin)
+            {
+                result[pair.Key] = -pair.Value;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 作为集合的减法。
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Counter<T> operator -(Counter<T> a, Counter<T> b)
+        {
+            var result = new Counter<T>();
+            foreach (var pair in a)
+            {
+                result[pair.Key] = pair.Value - b.GetValueOrDefault(pair.Key, 0);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 作为集合的加法。
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Counter<T> operator +(Counter<T> a, Counter<T> b)
+        {
+            var result = new Counter<T>();
+            foreach (var key in new HashSet<T>(a.Keys.Concat(b.Keys)))
+            {
+                result[key] = a.GetValueOrDefault(key, 0) + b.GetValueOrDefault(key, 0);
+            }
+
+            return result;
+        }
+
+        public static bool operator >(Counter<T> a, Counter<T> b)
+        {
+            var allKey = new HashSet<T>(a.Keys.Concat(b.Keys));
+            return allKey.All(key => a.GetValueOrDefault(key, 0) > b.GetValueOrDefault(key, 0));
+        }
+        
+        public static bool operator <(Counter<T> a, Counter<T> b)
+        {
+            var allKey = new HashSet<T>(a.Keys.Concat(b.Keys));
+            return allKey.All(key => a.GetValueOrDefault(key, 0) < b.GetValueOrDefault(key, 0));
+        }
+        
+        public static bool operator >=(Counter<T> a, Counter<T> b)
+        {
+            return !(a < b);
+        }
+        
+        public static bool operator <=(Counter<T> a, Counter<T> b)
+        {
+            return !(a > b);
+        }
+
+        public bool Equals(Counter<T> other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            var allKey = new HashSet<T>(Keys.Concat(other.Keys));
+            return allKey.All(key => this.GetValueOrDefault(key, 0) == other.GetValueOrDefault(key, 0));
         }
     }
 }
