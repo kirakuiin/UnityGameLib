@@ -76,5 +76,16 @@ namespace GameLib.Common
         {
             _pooledObjects[prefab].Release(obj);
         }
+
+        /// <summary>
+        /// 归还对象，将对象的父节点重置为对象池。
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="prefab"></param>
+        public void ReturnWithReParent(GameObject obj, GameObject prefab)
+        {
+            Return(obj, prefab);
+            obj.transform.SetParent(transform);
+        }
     }
 }
