@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
-namespace GameLib.UI.SectorLayout
+namespace GameLib.UI.Fitter
 {
     /// <summary>
     /// 让SectorLayout的CellSize属性可以自动适配父对象的大小。
     /// </summary>
-    [ExecuteInEditMode]
-    [RequireComponent(typeof(SectorLayout))]
-    public class SectorCellSizeFitter: MonoBehaviour
+    [ExecuteAlways]
+    [RequireComponent(typeof(SectorLayout.SectorLayout))]
+    public class SectorCellSizeFitter : SizeFitter
     {
         private enum Axis { X, Y };
         private enum RatioMode { Free, Fixed };
@@ -25,44 +24,18 @@ namespace GameLib.UI.SectorLayout
         private float CellRatio => expand == Axis.X ? cellSize.y / cellSize.x : cellSize.x / cellSize.y;
  
         private RectTransform _rectTransform;
-        private SectorLayout _sectorLayout;
+        private SectorLayout.SectorLayout _sectorLayout;
         private Vector2 _initialRatio;
  
-        private void Awake()
+        protected override void InitComponent()
         {
             _rectTransform = GetComponent<RectTransform>();
-            _sectorLayout = GetComponent<SectorLayout>();
+            _sectorLayout = GetComponent<SectorLayout.SectorLayout>();
             var rectSize = _rectTransform.rect.size;
             _initialRatio = cellSize / rectSize;
         }
         
-        void Start()
-        {
-            UpdateCellSize();
-        }
- 
-        void OnRectTransformDimensionsChange()
-        {
-            UpdateCellSize();
-        }
- 
-#if UNITY_EDITOR
-        [ExecuteAlways]
-        void Update()
-        {
-            if (Application.isPlaying) return;
-            UpdateCellSize();
-        }
-#endif
- 
-        void OnValidate()
-        {
-            _rectTransform = GetComponent<RectTransform>();
-            _sectorLayout = GetComponent<SectorLayout>();
-            UpdateCellSize();
-        }
- 
-        void UpdateCellSize()
+        protected override void UpdateSize()
         {
             if (_sectorLayout is null) return;
             var rectSize = _rectTransform.rect.size;
