@@ -2,7 +2,8 @@
     "name": "GameLib.UI",
     "rootNamespace": "",
     "references": [
-        "GUID:1a1ac9df26f3f664da5fcc345b16ebd2"
+        "GUID:1a1ac9df26f3f664da5fcc345b16ebd2",
+        "GUID:23eaa853a82047f8bdbe847c669e37ca"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

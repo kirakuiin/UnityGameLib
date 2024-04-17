@@ -8,7 +8,7 @@ namespace GameLib.UI.SectorLayout
     public class SectorAnimator : MonoBehaviour
     {
         [SerializeField]
-        protected float animateSpeed = 10;
+        protected float animateTime = 0.2f;
 
         /// <summary>
         /// 播放动画
@@ -20,6 +20,13 @@ namespace GameLib.UI.SectorLayout
         {
             childTransform.position = targetPosition;
             childTransform.rotation = targetRotation;
+        }
+
+        /// <summary>
+        /// 停止动画。
+        /// </summary>
+        public virtual void Stop()
+        {
         }
     }
 }

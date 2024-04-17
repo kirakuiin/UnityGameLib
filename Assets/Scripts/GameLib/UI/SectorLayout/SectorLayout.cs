@@ -120,47 +120,18 @@ namespace GameLib.UI.SectorLayout
         /// </summary>
         public void Rebuild()
         {
-            StopAllCoroutines();
-            StartCoroutine(RebuildCoroutine());
-        }
-
-        private IEnumerator RebuildCoroutine()
-        {
             var origin = Origin;
-            while (!HasBeenDone())
+            animator.Stop();
+            for (var i = 0; i < transform.childCount; ++i)
             {
-                for (var i = 0; i < transform.childCount; ++i)
+                var childTransform = transform.GetChild(i);
+                animator.Play(childTransform, CalcChildPosition(i, origin),
+                    CalcChildQuaternion(i));
+                if (childTransform.gameObject.TryGetComponent<IDrawOrder>(out var comp))
                 {
-                    var childTransform = transform.GetChild(i);
-                    animator.Play(childTransform, CalcChildPosition(i, origin),
-                        CalcChildQuaternion(i));
-                    if (childTransform.gameObject.TryGetComponent<IDrawOrder>(out var comp))
-                    {
-                        comp.Order = i+minimumOrder;
-                    }
+                    comp.Order = i+minimumOrder;
                 }
-                yield return null;
             }
-        }
-
-        private bool HasBeenDone()
-        {
-            var origin = Origin;
-            var query = from index in Enumerable.Range(0, transform.childCount)
-                select new
-                {
-                    basePos = transform.GetChild(index).position,
-                    baseRot = transform.GetChild(index).rotation,
-                    targetPos = CalcChildPosition(index, origin),
-                    targetRot = CalcChildQuaternion(index)
-                }
-                into element
-                where !MathExtension.Approximately(element.basePos, element.targetPos, 1)
-                      || !MathExtension.Approximately(element.baseRot, element.targetRot, 1)
-                select element;
-            
-            var isAllDone = query.ToArray().Length == 0;
-            return isAllDone;
         }
 
         /// <summary>

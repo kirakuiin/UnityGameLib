@@ -7,30 +7,30 @@ namespace GameLib.Animation
     /// <summary>
     /// 缩放行动。
     /// </summary>
-    public class ScaleAction: MonoBehaviour
+    public class ScaleAction : AnimationAction 
     {
         [Tooltip("缩放时间")]
         [SerializeField]
-        private float time = 0.5f;
+        public float time = 0.5f;
 
         /// <summary>
         /// 让目标缩放到指定大小。
         /// </summary>
         public void ScaleTo(Transform target, Vector3 destination, Action onDone=default)
         {
-            StartCoroutine(Scale(target, destination, onDone));
+            StartCoroutine(ScaleCoroutine(target, destination, onDone));
         }
 
-        private IEnumerator Scale(Transform tr, Vector3 scale, Action onDone)
+        private IEnumerator ScaleCoroutine(Transform obj, Vector3 to, Action onDone=default)
         {
-            float t = 0;
-            var startScale = tr.localScale;
+            var elapseTime = 0.0f;
+            var from = obj.localScale;
             while (true)
             {
-                t += Time.deltaTime;
-                float a = t / time;
-                tr.localScale = Vector3.Lerp(startScale, scale, a);
-                if (a >= 1.0f)
+                elapseTime += Time.deltaTime;
+                var progress = elapseTime / time;
+                obj.localScale = Vector3.Lerp(from, to, progress);
+                if (progress >= 1.0)
                     break;
                 yield return null;
             }
