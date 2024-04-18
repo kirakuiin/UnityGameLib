@@ -65,7 +65,7 @@ namespace GameLib.Network.NGO
             ResetAllClientRpc();
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.ClientsAndHost)]
         private void ResetAllClientRpc()
         {
             _pendingEvents.Clear();
@@ -111,8 +111,8 @@ namespace GameLib.Network.NGO
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void SyncEventServerRpc(string eventKey, ServerRpcParams rpcParams=default)
+        [Rpc(SendTo.Server)]
+        private void SyncEventServerRpc(string eventKey, RpcParams rpcParams=default)
         {
             UpdateEvent(eventKey, rpcParams.Receive.SenderClientId);
         }
@@ -132,7 +132,7 @@ namespace GameLib.Network.NGO
             }
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.ClientsAndHost)]
         private void SyncCompleteClientRpc(string eventKey)
         {
             Debug.Log($"网络同步事件{eventKey}完毕");
