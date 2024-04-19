@@ -162,7 +162,7 @@ namespace GameLib.Network
             while (taskInfo.IsRunning)
             {
                 _sender.Broadcast();
-                await Task.Delay((int)(BroadcastInterval*(int)TimeScalar.MillisecondsPerSecond));
+                await Task.Delay((int)(BroadcastInterval*TimeScalar.MillisecondsPerSecond));
             }
         }
 
@@ -198,7 +198,7 @@ namespace GameLib.Network
 
         public BroadcastListener(int broadcastPort=BroadcastSender<T>.DefaultBroadcastPort)
         {
-            _receiver = new(broadcastPort);
+            _receiver = new BroadcastReceiver<T>(broadcastPort);
         }
 
         /// <value>
@@ -215,8 +215,13 @@ namespace GameLib.Network
             _tasks.Enqueue(task);
             while (task.IsRunning)
             {
-                var package = await _receiver.ReceiveAsync();
-                InvokeEvent(package);
+                try
+                {
+                    var package = await _receiver.ReceiveAsync();
+                    InvokeEvent(package);
+                }
+                // 忽略udp客户端关闭导致的异常。
+                catch (ObjectDisposedException) {}
             }
         }
 

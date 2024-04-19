@@ -10,8 +10,7 @@ namespace GameLib.Network.Analysis
     /// </summary>
     public class Latency
     {
-
-        private readonly Ping _sender = new Ping();
+        private readonly Ping _sender = new ();
 
         private readonly int _timeout;
 
@@ -42,8 +41,10 @@ namespace GameLib.Network.Analysis
         /// <returns><c>Task&lt;NetworkStatus&gt;</c></returns>
         public async Task<NetworkStatus> GetLatencyAsync()
         {
-           var reply = await _sender.SendPingAsync(_targetAddress, TimeScalar.ConvertSecondToMs(_timeout));
-           return new NetworkStatus(reply);
+            var ipList = await Dns.GetHostAddressesAsync(_targetAddress);
+            if (ipList.Length == 0) return NetworkStatus.CreateUnreachableStatus(_targetAddress);
+            var reply = await _sender.SendPingAsync(ipList[0], TimeScalar.ConvertSecondToMs(_timeout));
+            return new NetworkStatus(reply);
         }
 
         /// <summary>
@@ -51,6 +52,24 @@ namespace GameLib.Network.Analysis
         /// </summary>
         public readonly struct NetworkStatus
         {
+            private const int UnreachableTime = 9999;
+            
+            /// <summary>
+            /// 创建不可达状态。
+            /// </summary>
+            /// <returns></returns>
+            public static NetworkStatus CreateUnreachableStatus(string ip)
+            {
+                return new NetworkStatus(ip);
+            }
+
+            private NetworkStatus(string ip)
+            {
+                TargetIP = IPAddress.TryParse(ip, out var ipAddress) ? ipAddress : IPAddress.None;
+                Status = IPStatus.DestinationUnreachable;
+                Latency = UnreachableTime;
+            }
+            
             public NetworkStatus(PingReply reply)
             {
                 TargetIP = reply.Address;
@@ -78,8 +97,7 @@ namespace GameLib.Network.Analysis
             /// <summary>
             /// 目标地址是否可达
             /// </summary>
-            /// <returns>如果可达返回<c>true</c></returns>
-            public bool IsReachable() => Status == IPStatus.Success;
+            public bool IsReachable => Status == IPStatus.Success;
         }
     }
 }
