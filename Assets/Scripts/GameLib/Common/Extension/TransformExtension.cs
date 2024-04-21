@@ -14,8 +14,8 @@ namespace GameLib.Common.Extension
         /// <param name="func"></param>
         public static void DoSomethingToAllChildren(this Transform trans, Action<GameObject> func)
         {
-            var allChildren = from idx in Enumerable.Range(0, trans.childCount)
-                select trans.GetChild(idx).gameObject;
+            var allChildren = (from idx in Enumerable.Range(0, trans.childCount)
+                select trans.GetChild(idx).gameObject).ToList();
             foreach (var gameObject in allChildren)
             {
                 func(gameObject);
