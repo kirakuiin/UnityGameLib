@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using GameLib.Common;
 using Unity.Netcode;
 using UnityEngine;
@@ -37,25 +36,29 @@ namespace GameLib.Network.NGO.ConnectionManagement
 
         private void Start()
         {
-            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
+            NetworkManager.Singleton.OnConnectionEvent += OnConnectionEvent;
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.OnServerStopped += OnServerStopped;
             NetworkManager.Singleton.ConnectionApprovalCallback += OnApproveCheck;
             NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
         }
 
-        private void OnClientConnected(ulong clientID)
+        private void OnConnectionEvent(NetworkManager manager, ConnectionEventData e)
         {
-            Debug.Log($"客户端{clientID}连接。");
-            _currentState.OnClientConnected(clientID);
+            var clientID = e.ClientId;
+            switch (e.EventType)
+            {
+                case ConnectionEvent.ClientConnected:
+                    Debug.Log($"客户端{clientID}连接。");
+                    _currentState.OnClientConnected(clientID);
+                    break;
+                case ConnectionEvent.ClientDisconnected:
+                    Debug.Log($"客户端{clientID}断开连接。");
+                    _currentState.OnClientDisconnected(clientID);
+                    break;
+            }
         }
 
-        private void OnClientDisconnect(ulong clientID)
-        {
-            Debug.Log($"客户端{clientID}断开连接。");
-            _currentState.OnClientDisconnected(clientID);
-        }
 
         private void OnServerStarted()
         {
@@ -85,8 +88,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
         {
             if (NetworkManager.Singleton != null)
             {
-                NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-                NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
+                NetworkManager.Singleton.OnConnectionEvent -= OnConnectionEvent;
                 NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
                 NetworkManager.Singleton.OnServerStopped -= OnServerStopped;
                 NetworkManager.Singleton.ConnectionApprovalCallback -= OnApproveCheck;

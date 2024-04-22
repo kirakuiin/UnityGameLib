@@ -22,15 +22,16 @@ namespace GameLib.Network.NGO.Channel
 
         private void InitRegister()
         {
-            _networkManager.OnClientConnectedCallback += OnClientConnected;
+            _networkManager.OnConnectionEvent += OnConnectionEvent;
             if (_networkManager.IsListening)
             {
                 RegisterHandler();
             }
         }
 
-        private void OnClientConnected(ulong obj)
+        private void OnConnectionEvent(NetworkManager manager, ConnectionEventData e)
         {
+            if (e.EventType != ConnectionEvent.ClientConnected) return;
             RegisterHandler();
         }
 
@@ -63,25 +64,22 @@ namespace GameLib.Network.NGO.Channel
 
         private void SendMessageThroughNetwork(T message)
         {
-            if (!IsNetworkWorking()) return;
+            if (!IsNetworkWorking) return;
 
             var writer = new FastBufferWriter(FastBufferWriter.GetWriteSize<T>(), Allocator.Temp);
             writer.WriteValueSafe(message);
             _networkManager.CustomMessagingManager.SendNamedMessageToAll(_channelName, writer);
         }
 
-        private bool IsNetworkWorking()
-        {
-            return _networkManager != null && _networkManager.CustomMessagingManager != null;
-        }
+        private bool IsNetworkWorking => _networkManager != null && _networkManager.CustomMessagingManager != null;
 
         protected override void Dispose(bool isDisposing)
         {
             if (IsDisposed) return;
-            if (!IsNetworkWorking()) return;
+            if (!IsNetworkWorking) return;
             
             _networkManager.CustomMessagingManager.UnregisterNamedMessageHandler(_channelName);
-            _networkManager.OnClientConnectedCallback -= OnClientConnected;
+            _networkManager.OnConnectionEvent -= OnConnectionEvent;
             
             base.Dispose(isDisposing);
         }

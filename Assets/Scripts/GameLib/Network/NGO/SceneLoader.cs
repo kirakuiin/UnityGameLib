@@ -1,4 +1,5 @@
 ﻿using System;
+using GameLib.Common;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,7 +10,7 @@ namespace GameLib.Network.NGO
     /// 通过封装API来加载场景，使用<see cref="SceneManager"/>来加载场景。
     /// 或者是使用<see cref="NetworkManager.SceneManager"/>来加载场景。
     /// </summary>
-    public class SceneLoader : NetworkSingleton<SceneLoader>
+    public class SceneLoader : PersistentMonoSingleton<SceneLoader>
     {
         /// <summary>
         /// 场景加载时触发。
@@ -23,6 +24,8 @@ namespace GameLib.Network.NGO
 
         private bool _isInitialized;
         
+        private NetworkManager NetworkManager => NetworkManager.Singleton;
+        
         private bool IsNetworkSceneManagementEnable =>
             (NetworkManager != null
              && NetworkManager.SceneManager != null
@@ -35,7 +38,7 @@ namespace GameLib.Network.NGO
         /// <param name="mode">加载模式</param>
         public void LoadSceneByNet(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
         {
-            if (IsSpawned && IsNetworkSceneManagementEnable && !NetworkManager.ShutdownInProgress)
+            if (IsNetworkSceneManagementEnable && !NetworkManager.ShutdownInProgress)
             {
                 if (NetworkManager.IsServer)
                 {
@@ -103,16 +106,13 @@ namespace GameLib.Network.NGO
         private void Synchronize()
         {
             // 处在这种情况下时，NGO不会主动卸载额外场景来保证和服务器同步，所以手动卸载。
-            if (IsPureClient() && NetworkManager.SceneManager.ClientSynchronizationMode == LoadSceneMode.Single)
+            if (IsPureClient && NetworkManager.SceneManager.ClientSynchronizationMode == LoadSceneMode.Single)
             {
                 UnloadAddictiveScenes();
             }
         }
 
-        private bool IsPureClient()
-        {
-            return NetworkManager.IsClient && !NetworkManager.IsHost;
-        }
+        private bool IsPureClient => NetworkManager.IsClient && !NetworkManager.IsHost;
 
         private void UnloadAddictiveScenes()
         {
@@ -137,7 +137,7 @@ namespace GameLib.Network.NGO
             _isInitialized = false;
         }
 
-        public override void OnDestroy()
+        protected override void OnDestroy()
         {
             SceneManager.sceneLoaded -= OnSceneManagerSceneLoaded;
             if (NetworkManager != null)

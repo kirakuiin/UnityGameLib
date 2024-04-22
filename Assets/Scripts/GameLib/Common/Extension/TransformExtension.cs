@@ -16,10 +16,7 @@ namespace GameLib.Common.Extension
         {
             var allChildren = (from idx in Enumerable.Range(0, trans.childCount)
                 select trans.GetChild(idx).gameObject).ToList();
-            foreach (var gameObject in allChildren)
-            {
-                func(gameObject);
-            }
+            allChildren.Apply(func);
         }
 
         /// <summary>

@@ -91,6 +91,5 @@ namespace GameLib.Network.NGO
             base.OnDestroy();
             Destroy();
         }
-        
     }
 }
