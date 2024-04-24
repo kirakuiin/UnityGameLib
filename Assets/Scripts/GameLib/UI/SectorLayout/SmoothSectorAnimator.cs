@@ -20,8 +20,6 @@ namespace GameLib.UI.SectorLayout
         {
             _move = GetComponent<MoveAction>();
             _rotate = GetComponent<RotateAction>();
-            _move.time = animateTime;
-            _rotate.time = animateTime;
         }
         
         /// <summary>
@@ -32,21 +30,8 @@ namespace GameLib.UI.SectorLayout
         /// <param name="targetRotation">节点的目标旋转</param>
         public override void Play(Transform childTransform, Vector3 targetPosition, Quaternion targetRotation)
         {
-            _move.MoveTo(childTransform, targetPosition);
-            _rotate.RotateTo(childTransform, targetRotation);
-        }
-
-        private void OnValidate()
-        {
-            if (_rotate != null)
-            {
-                _rotate.time = animateTime;
-            }
-
-            if (_move != null)
-            {
-                _move.time = animateTime;
-            }
+            _move.MoveTo(childTransform, targetPosition, animateTime);
+            _rotate.RotateTo(childTransform, targetRotation, animateTime);
         }
 
         public override void Stop()

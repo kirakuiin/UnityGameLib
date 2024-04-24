@@ -9,22 +9,19 @@ namespace GameLib.Animation
     /// </summary>
     public class RotateAction: AnimationAction
     {
-        [Tooltip("旋转时间")]
-        [SerializeField]
-        public float time = 0.5f;
-
         /// <summary>
-        /// 让目标移动到指定位置。
+        /// 让目标在指定时间内旋转到指定位置。
         /// </summary>
         /// <param name="target"></param>
         /// <param name="destination"></param>
+        /// <param name="time"></param>
         /// <param name="onDone"></param>
-        public void RotateTo(Transform target, Quaternion destination, Action onDone=default)
+        public void RotateTo(Transform target, Quaternion destination, float time, Action onDone=default)
         {
-            StartCoroutine(RotateCoroutine(target, destination, onDone));
+            StartCoroutine(RotateCoroutine(target, destination, time, onDone));
         }
 
-        private IEnumerator RotateCoroutine(Transform obj, Quaternion to, Action onDone=default)
+        private IEnumerator RotateCoroutine(Transform obj, Quaternion to, float time, Action onDone=default)
         {
             var elapseTime = 0.0f;
             var baseTime = Quaternion.Angle(obj.rotation, to)/time;

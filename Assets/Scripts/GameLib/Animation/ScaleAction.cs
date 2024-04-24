@@ -9,19 +9,20 @@ namespace GameLib.Animation
     /// </summary>
     public class ScaleAction : AnimationAction 
     {
-        [Tooltip("缩放时间")]
-        [SerializeField]
-        public float time = 0.5f;
-
+        
         /// <summary>
-        /// 让目标缩放到指定大小。
+        /// 让目标在指定时间缩放到指定大小。
         /// </summary>
-        public void ScaleTo(Transform target, Vector3 destination, Action onDone=default)
+        /// <param name="target"></param>
+        /// <param name="destination"></param>
+        /// <param name="time"></param>
+        /// <param name="onDone"></param>
+        public void ScaleTo(Transform target, Vector3 destination, float time, Action onDone=default)
         {
-            StartCoroutine(ScaleCoroutine(target, destination, onDone));
+            StartCoroutine(ScaleCoroutine(target, destination, time, onDone));
         }
 
-        private IEnumerator ScaleCoroutine(Transform obj, Vector3 to, Action onDone=default)
+        private IEnumerator ScaleCoroutine(Transform obj, Vector3 to, float time, Action onDone=default)
         {
             var elapseTime = 0.0f;
             var from = obj.localScale;
