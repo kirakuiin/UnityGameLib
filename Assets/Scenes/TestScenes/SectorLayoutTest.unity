@@ -719,8 +719,6 @@ GameObject:
   - component: {fileID: 1731762888}
   - component: {fileID: 1731762890}
   - component: {fileID: 1731762889}
-  - component: {fileID: 1731762893}
-  - component: {fileID: 1731762892}
   - component: {fileID: 1731762891}
   m_Layer: 5
   m_Name: Hands
@@ -846,36 +844,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1731762883}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f51d3bbcf15f4eee95da40114c22bb56, type: 3}
+  m_Script: {fileID: 11500000, guid: 50e5535119b1411a96d5313b246b17df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   animateTime: 0.2
---- !u!114 &1731762892
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1731762883}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e5046833d0642f68242be3a63bec039, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  time: 0.2
---- !u!114 &1731762893
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1731762883}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c62e66ff85a64dbdac44788dd368f9d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  time: 0.2
 --- !u!1 &1763506429
 GameObject:
   m_ObjectHideFlags: 0
