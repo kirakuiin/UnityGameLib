@@ -204,9 +204,9 @@ namespace GameLib.Network.NGO
 
         private void ClearDisconnectedPlayersData()
         {
-            var clientIDNeedToBeCleared = from clientID in _clientIDToPlayerID.Keys
+            var clientIDNeedToBeCleared = (from clientID in _clientIDToPlayerID.Keys
                                           where GetPlayerData(clientID) is {IsConnected : false}
-                                          select clientID;
+                                          select clientID).ToList();
                                         
             foreach (var clientID in clientIDNeedToBeCleared)
             {
