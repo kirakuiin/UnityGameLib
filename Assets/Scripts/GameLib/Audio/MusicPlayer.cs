@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using GameLib.Common;
 
 namespace GameLib.Audio
 {
@@ -22,11 +21,11 @@ namespace GameLib.Audio
             {
                 if (!restart && source.clip == clip) return;
                 source.Stop();
+                source.time = 0;
             }
 
             source.clip = clip;
             source.loop = isLooping;
-            source.time = 0;
             source.Play();
         }
 
@@ -39,6 +38,14 @@ namespace GameLib.Audio
             {
                 source.Stop();
             }
+        }
+
+        /// <summary>
+        /// 暂停播放。
+        /// </summary>
+        public void Pause()
+        {
+            source.Pause();
         }
     }
 }

@@ -42,7 +42,10 @@ namespace GameLib.Network.NGO
         // 客户端ID到玩家ID的映射
         private readonly Dictionary<ulong, string> _clientIDToPlayerID = new();
 
-        private bool _isSessionStarted;
+        /// <summary>
+        /// 会话是否启动？
+        /// </summary>
+        public bool IsSessionStarted { private set; get; }
 
         /// <summary>
         /// 初始化玩家会话数据，或者重新设置其数据
@@ -79,7 +82,12 @@ namespace GameLib.Network.NGO
             return _clientData.ContainsKey(playerID) && _clientData[playerID].IsConnected;
         }
 
-        private bool IsReconnecting(string playerID)
+        /// <summary>
+        /// 是否为重连？
+        /// </summary>
+        /// <param name="playerID"></param>
+        /// <returns></returns>
+        public bool IsReconnecting(string playerID)
         {
             return _clientData.ContainsKey(playerID) && !_clientData[playerID].IsConnected;
         }
@@ -90,7 +98,7 @@ namespace GameLib.Network.NGO
         /// <param name="clientID">NGO分配的客户端ID</param>
         public void DisconnectClient(ulong clientID)
         {
-            if (_isSessionStarted)
+            if (IsSessionStarted)
             {
                 KeepPlayerData(clientID);
             }
@@ -176,7 +184,7 @@ namespace GameLib.Network.NGO
         /// </summary>
         public void StartSession()
         {
-            _isSessionStarted = true;
+            IsSessionStarted = true;
         }
 
         /// <summary>
@@ -186,7 +194,7 @@ namespace GameLib.Network.NGO
         {
             _clientData.Clear();
             _clientIDToPlayerID.Clear();
-            _isSessionStarted = false;
+            IsSessionStarted = false;
         }
 
         /// <summary>
@@ -199,7 +207,7 @@ namespace GameLib.Network.NGO
         {
             ClearDisconnectedPlayersData();
             ReinitializePlayersData();
-            _isSessionStarted = false;
+            IsSessionStarted = false;
         }
 
         private void ClearDisconnectedPlayersData()

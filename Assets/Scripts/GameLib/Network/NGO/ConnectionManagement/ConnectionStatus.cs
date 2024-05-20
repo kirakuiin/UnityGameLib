@@ -61,5 +61,10 @@
         /// 客户端认证失败，比如说密码错误。
         /// </summary>
         ApprovalFailed,
+        
+        /// <summary>
+        /// 自定义错误。
+        /// </summary>
+        UserDefined,
     }
 }
