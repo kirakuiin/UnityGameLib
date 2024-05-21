@@ -60,8 +60,8 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// <param name="response"></param>
         protected virtual void SetResponse(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
-            var status = GetConnectStatus(request);
-            if (status == ConnectStatus.Success)
+            var info = GetConnectInfo(request);
+            if (info.Status == ConnectStatus.Success)
             {
                 response.Approved = true;
                 response.CreatePlayerObject = true;
@@ -69,7 +69,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
             else
             {
                 response.Approved = false;
-                response.Reason = JsonUtility.ToJson(status);
+                response.Reason = JsonUtility.ToJson(info);
             }
         }
 
@@ -78,19 +78,19 @@ namespace GameLib.Network.NGO.ConnectionManagement
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        protected virtual ConnectStatus GetConnectStatus(NetworkManager.ConnectionApprovalRequest request)
+        protected virtual ConnectInfo GetConnectInfo(NetworkManager.ConnectionApprovalRequest request)
         {
             var payload = SerializeTool.Deserialize<ConnectionPayload>(request.Payload);
             if (NetManager.ConnectedClientsIds.Count >= ConnManager.config.maxConnectedPlayerNum)
             {
-                return ConnectStatus.ServerFull;
+                return ConnectInfo.Create(ConnectStatus.ServerFull);
             }
             if (payload.isDebug != Debug.isDebugBuild)
             {
-                return ConnectStatus.IncompatibleBuildType;
+                return ConnectInfo.Create(ConnectStatus.IncompatibleBuildType);
             }
             
-            return ConnectStatus.Success;
+            return ConnectInfo.Create(ConnectStatus.Success);
         }
     }
 }
