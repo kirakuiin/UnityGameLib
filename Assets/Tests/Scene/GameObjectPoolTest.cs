@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameLib.Common;
 using GameLib.Common.Extension;
 using UnityEngine;

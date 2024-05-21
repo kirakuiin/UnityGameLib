@@ -53,19 +53,19 @@ namespace GameLib.Network.NGO.ConnectionManagement
             var disconnectReason = NetManager.DisconnectReason;
             if (string.IsNullOrEmpty(disconnectReason))
             {
-                Publisher.Publish(ConnectStatus.StartClientFailed);
+                Publisher.Publish(ConnectInfo.Create(ConnectStatus.StartClientFailed));
             }
             else
             {
-                var connectStatus = JsonUtility.FromJson<ConnectStatus>(disconnectReason);
-                Publisher.Publish(connectStatus);
+                var connectInfo = JsonUtility.FromJson<ConnectInfo>(disconnectReason);
+                Publisher.Publish(connectInfo);
             }
             ConnManager.ChangeState<OfflineState>();
         }
 
         public override void OnClientConnected(ulong clientID)
         {
-            Publisher.Publish(ConnectStatus.Success);
+            Publisher.Publish(ConnectInfo.Create(ConnectStatus.Success));
             ConnManager.ChangeState<ClientConnectedState>();
         }
 

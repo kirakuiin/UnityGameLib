@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement

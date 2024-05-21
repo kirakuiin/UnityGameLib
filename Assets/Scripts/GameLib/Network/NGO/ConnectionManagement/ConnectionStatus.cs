@@ -1,4 +1,7 @@
-﻿namespace GameLib.Network.NGO.ConnectionManagement
+﻿using Unity.Collections;
+using Unity.Netcode;
+
+namespace GameLib.Network.NGO.ConnectionManagement
 {
     /// <summary>
     /// 网络连接状态
@@ -66,5 +69,37 @@
         /// 自定义错误。
         /// </summary>
         UserDefined,
+    }
+
+    /// <summary>
+    /// 连接信息。
+    /// </summary>
+    public struct ConnectInfo : INetworkSerializeByMemcpy
+    {
+        /// <summary>
+        /// 创建一个连接信息对象。
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="desc"></param>
+        /// <returns></returns>
+        public static ConnectInfo Create(ConnectStatus status, string desc = "")
+        {
+            return new ConnectInfo { Status = status, Desc = desc};
+        }
+        
+        /// <summary>
+        /// 连接状态。
+        /// </summary>
+        public ConnectStatus Status;
+
+        /// <summary>
+        /// 具体描述信息。
+        /// </summary>
+        public FixedString32Bytes Desc;
+
+        public override string ToString()
+        {
+            return Desc == "" ? $"{Status}" : $"{Status}[{Desc}]";
+        }
     }
 }

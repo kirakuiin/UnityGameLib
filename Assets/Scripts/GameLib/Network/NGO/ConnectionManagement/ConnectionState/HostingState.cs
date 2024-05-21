@@ -38,7 +38,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
 
         public override void OnServerStopped()
         {
-            Publisher.Publish(ConnectStatus.GenericDisconnect);
+            Publisher.Publish(ConnectInfo.Create(ConnectStatus.GenericDisconnect));
             ConnManager.ChangeState<OfflineState>();
         }
 

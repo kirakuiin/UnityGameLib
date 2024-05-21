@@ -1,6 +1,5 @@
 ﻿using Unity.Netcode;
 using System;
-using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement
@@ -43,13 +42,13 @@ namespace GameLib.Network.NGO.ConnectionManagement
 
         private void StartFailed()
         {
-            Publisher.Publish(ConnectStatus.StartHostFailed);
+            Publisher.Publish(ConnectInfo.Create(ConnectStatus.StartHostFailed));
             ConnManager.ChangeState<OfflineState>();
         }
 
         public override void OnServerStarted()
         {
-            Publisher.Publish(ConnectStatus.Success);
+            Publisher.Publish(ConnectInfo.Create(ConnectStatus.Success));
             ConnManager.ChangeState<HostingState>();
         }
 

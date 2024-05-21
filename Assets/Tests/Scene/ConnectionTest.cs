@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GameLib.Common;
 using GameLib.Common.Extension;
 using GameLib.Network;
@@ -18,6 +19,10 @@ namespace Tests.Scene
         [SerializeField] private ushort port;
 
         private IDisposable _handler;
+
+        private bool _recvRequest;
+
+        private CustomHosting _host;
         
         private void Start()
         {
@@ -27,11 +32,11 @@ namespace Tests.Scene
 
         void InitService()
         {
-            ServiceLocator.Instance.Register<IPublisher<ConnectStatus>>(new MessageChannel<ConnectStatus>());
-            _handler = ServiceLocator.Instance.Get<ISubscriber<ConnectStatus>>().Subscribe(OnStatusChange);
+            ServiceLocator.Instance.Register<IPublisher<ConnectInfo>>(new MessageChannel<ConnectInfo>());
+            _handler = ServiceLocator.Instance.Get<ISubscriber<ConnectInfo>>().Subscribe(OnStatusChange);
         }
 
-        void OnStatusChange(ConnectStatus status)
+        void OnStatusChange(ConnectInfo status)
         {
             Debug.Log($"网络状态为：{status}");
         }
@@ -39,13 +44,19 @@ namespace Tests.Scene
         void InitConnectionState()
         {
             var connectMethod = new DirectIPConnectionMethod(Address.GetIPEndPoint(ipAddr, port));
+            _host = new CustomHosting(OnConnect);
             ConnectionManager.Instance.AddState(new OfflineState());
             ConnectionManager.Instance.AddState(new StartHostingState(connectMethod));
-            ConnectionManager.Instance.AddState(new HostingState());
+            ConnectionManager.Instance.AddState<HostingState>(_host);
             ConnectionManager.Instance.AddState(new ClientConnectingState(connectMethod));
             ConnectionManager.Instance.AddState(new ClientConnectedState());
             ConnectionManager.Instance.AddState(new ClientReconnectingState(connectMethod));
             Debug.Log(ConnectionManager.Instance.GetStatesByInterface<IConnectionResettable>().Count());
+        }
+
+        private void OnConnect()
+        {
+            _recvRequest = true;
         }
 
         private void OnGUI()
@@ -91,6 +102,21 @@ namespace Tests.Scene
             {
                 RandomPos(NetworkManager.Singleton.LocalClient.PlayerObject);
             }
+
+            if (_recvRequest)
+            {
+                if (GUILayout.Button("允许加入"))
+                {
+                    _host.SetAllowConnection(true);
+                    _recvRequest = false;
+                }
+
+                if (GUILayout.Button("不允许加入"))
+                {
+                    _host.SetAllowConnection(false);
+                    _recvRequest = false;
+                }
+            }
         }
 
         void ShowClientOption()
@@ -112,5 +138,50 @@ namespace Tests.Scene
             obj.gameObject.transform.position = new Vector3(random.Choice(posList), random.Choice(posList));
         }
             
+    }
+
+    public class CustomHosting : HostingState
+    {
+        private readonly Action _callback;
+
+        private bool _isSet;
+
+        private bool _isAllow;
+        
+        public CustomHosting(Action callback)
+        {
+            _callback = callback;
+        }
+        
+        protected override async void SetResponse(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        {
+            response.Pending = true;
+            _isSet = false;
+            _callback();
+            await WaitForDecision(response);
+        }
+
+        public void SetAllowConnection(bool isAllow)
+        {
+            _isAllow = isAllow;
+            _isSet = true;
+        }
+
+        private async Task WaitForDecision(NetworkManager.ConnectionApprovalResponse response)
+        {
+            await TaskExtension.Wait(() => _isSet);
+            if (_isAllow)
+            {
+                response.Approved = true;
+                response.CreatePlayerObject = true;
+            }
+            else
+            {
+                response.Approved = false;
+                response.Reason = JsonUtility.ToJson(ConnectInfo.Create(ConnectStatus.UserDefined, "大咩"));
+            }
+
+            response.Pending = false;
+        }
     }
 }

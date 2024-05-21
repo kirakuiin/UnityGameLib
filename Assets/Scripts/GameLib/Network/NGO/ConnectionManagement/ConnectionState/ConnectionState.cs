@@ -1,5 +1,4 @@
-﻿using System.Net;
-using GameLib.Common;
+﻿using GameLib.Common;
 using GameLib.Network.NGO.Channel;
 using Unity.Netcode;
 
@@ -23,7 +22,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
     /// </summary>
     public abstract class ConnectionState
     {
-        protected readonly IPublisher<ConnectStatus> Publisher = ServiceLocator.Instance.Get<IPublisher<ConnectStatus>>();
+        protected readonly IPublisher<ConnectInfo> Publisher = ServiceLocator.Instance.Get<IPublisher<ConnectInfo>>();
 
         protected readonly ConnectionManager ConnManager = ConnectionManager.Instance;
 

@@ -8,7 +8,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
     {
         public override void OnUserRequestShutdown()
         {
-            Publisher.Publish(ConnectStatus.UserRequestedDisconnect);
+            Publisher.Publish(ConnectInfo.Create(ConnectStatus.UserRequestedDisconnect));
             ConnManager.ChangeState<OfflineState>();
         }
 

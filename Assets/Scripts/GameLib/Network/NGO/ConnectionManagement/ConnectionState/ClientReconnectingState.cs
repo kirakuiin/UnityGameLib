@@ -101,8 +101,8 @@ namespace GameLib.Network.NGO.ConnectionManagement
             else
             {
                 HandleByDisconnectReason(
-                    nullAction: () => Publisher.Publish(ConnectStatus.GenericDisconnect),
-                    statusAction: status => Publisher.Publish(status)
+                    nullAction: () => Publisher.Publish(ConnectInfo.Create(ConnectStatus.GenericDisconnect)),
+                    statusAction: status => Publisher.Publish(ConnectInfo.Create(status))
                 );
                 ConnManager.ChangeState<OfflineState>();
             }
@@ -136,7 +136,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
 
         private void ChangeStateByStatus(ConnectStatus status)
         {
-            Publisher.Publish(status);
+            Publisher.Publish(ConnectInfo.Create(status));
             if (_offlineStateList.Contains(status))
             {
                 ConnManager.ChangeState<OfflineState>();
