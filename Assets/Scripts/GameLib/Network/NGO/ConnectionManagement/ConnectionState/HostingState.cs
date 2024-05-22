@@ -28,7 +28,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
                 where clientID != NetManager.LocalClientId
                 select clientID).ToList();
             
-            var reason = JsonUtility.ToJson(ConnectStatus.HostEndSession);
+            var reason = JsonUtility.ToJson(ConnectInfo.Create(ConnectStatus.HostEndSession));
             foreach (var clientID in idsNeedToDisconnect)
             {
                 NetManager.DisconnectClient(clientID, reason);

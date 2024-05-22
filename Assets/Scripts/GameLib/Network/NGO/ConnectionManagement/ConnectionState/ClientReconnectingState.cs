@@ -102,7 +102,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
             {
                 HandleByDisconnectReason(
                     nullAction: () => Publisher.Publish(ConnectInfo.Create(ConnectStatus.GenericDisconnect)),
-                    statusAction: status => Publisher.Publish(ConnectInfo.Create(status))
+                    statusAction: info => Publisher.Publish(info)
                 );
                 ConnManager.ChangeState<OfflineState>();
             }
@@ -116,7 +116,7 @@ namespace GameLib.Network.NGO.ConnectionManagement
             );
         }
 
-        private void HandleByDisconnectReason(Action nullAction, Action<ConnectStatus> statusAction)
+        private void HandleByDisconnectReason(Action nullAction, Action<ConnectInfo> statusAction)
         {
             var disconnectReason = NetManager.DisconnectReason;
             if (string.IsNullOrEmpty(disconnectReason))
@@ -125,19 +125,19 @@ namespace GameLib.Network.NGO.ConnectionManagement
             }
             else
             {
-                statusAction(GetStatusFromManager());
+                statusAction(GetConnInfoFromManager());
             }
         }
 
-        private ConnectStatus GetStatusFromManager()
+        private ConnectInfo GetConnInfoFromManager()
         {
-            return JsonUtility.FromJson<ConnectStatus>(NetManager.DisconnectReason);
+            return JsonUtility.FromJson<ConnectInfo>(NetManager.DisconnectReason);
         }
 
-        private void ChangeStateByStatus(ConnectStatus status)
+        private void ChangeStateByStatus(ConnectInfo info)
         {
-            Publisher.Publish(ConnectInfo.Create(status));
-            if (_offlineStateList.Contains(status))
+            Publisher.Publish(info);
+            if (_offlineStateList.Contains(info.Status))
             {
                 ConnManager.ChangeState<OfflineState>();
             }
