@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using GameLib.Common;
 using GameLib.Common.Extension;
+using GameLib.Common.Utility;
 using UnityEngine;
 using Random = System.Random;
 

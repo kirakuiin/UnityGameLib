@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameLib.Common.Pattern;
 using UnityEngine;
 
-namespace GameLib.Common
+namespace GameLib.Common.Utility
 {
     /// <summary>
     /// 管理本地的进度同步事件。
@@ -72,6 +73,15 @@ namespace GameLib.Common
             var eventKey = EventToStr(e);
             _eventAction[eventKey]?.Invoke();
             _eventAction[eventKey] = null;
+        }
+
+        /// <summary>
+        /// 重置全部同步事件。
+        /// </summary>
+        public void ResetAll()
+        {
+            _eventCounter.Clear();
+            _eventAction.Clear();
         }
     }
 }

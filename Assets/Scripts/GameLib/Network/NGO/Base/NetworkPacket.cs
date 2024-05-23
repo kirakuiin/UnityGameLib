@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using Unity.Netcode;
-using UnityEngine;
 using Newtonsoft.Json;
-using UnityEngine.AI;
 
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO

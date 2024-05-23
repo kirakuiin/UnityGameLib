@@ -1,5 +1,5 @@
 ﻿using System;
-using GameLib.Common;
+using GameLib.Common.Pattern;
 
 namespace GameLib.Network.NGO.Channel
 {

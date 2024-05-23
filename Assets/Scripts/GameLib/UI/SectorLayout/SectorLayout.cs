@@ -1,7 +1,4 @@
-using System.Collections;
 using UnityEngine;
-using System.Linq;
-using GameLib.Common.Extension;
 using GameLib.UI.Extension;
 
 namespace GameLib.UI.SectorLayout

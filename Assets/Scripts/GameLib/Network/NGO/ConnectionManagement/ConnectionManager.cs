@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameLib.Common;
+using GameLib.Common.Pattern;
 using Unity.Netcode;
 using UnityEngine;
 

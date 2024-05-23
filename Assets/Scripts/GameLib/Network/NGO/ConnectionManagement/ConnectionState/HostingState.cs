@@ -1,7 +1,7 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
-using GameLib.Common;
+using GameLib.Common.Utility;
 
 // ReSharper disable once CheckNamespace
 namespace GameLib.Network.NGO.ConnectionManagement

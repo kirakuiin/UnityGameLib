@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GameLib.Common
+namespace GameLib.Common.Utility
 {
     /// <summary>
     /// 生成和获得玩家的GUID

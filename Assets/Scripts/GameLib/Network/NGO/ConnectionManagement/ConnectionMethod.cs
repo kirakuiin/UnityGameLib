@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using GameLib.Common;
+using GameLib.Common.Utility;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace GameLib.Common
+namespace GameLib.Common.Utility
 {
     /// <summary>
     /// 序列化工具。

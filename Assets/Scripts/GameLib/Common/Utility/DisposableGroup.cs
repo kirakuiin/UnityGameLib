@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GameLib.Common
+namespace GameLib.Common.Utility
 {
     /// <summary>
     /// 通用资源管理抽象类，实现基础的资源管理。

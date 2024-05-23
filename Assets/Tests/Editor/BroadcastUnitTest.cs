@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using GameLib.Network;
+using GameLib.Network.Utility;
 using NUnit.Framework;
 using UnityEngine;
 

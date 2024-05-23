@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameLib.Common
+namespace GameLib.Common.Pattern
 {
     /// <summary>
     /// 需要提供游戏服务的类型需要实现此接口。

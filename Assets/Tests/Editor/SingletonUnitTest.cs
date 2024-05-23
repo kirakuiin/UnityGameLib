@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using GameLib.Common;
+using GameLib.Common.Pattern;
 
 namespace Tests.Editor
 {

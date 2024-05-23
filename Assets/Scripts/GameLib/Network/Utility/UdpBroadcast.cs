@@ -5,8 +5,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using GameLib.Common;
+using GameLib.Common.Extension;
+using GameLib.Common.Utility;
 
-namespace GameLib.Network
+namespace GameLib.Network.Utility
 {
     /// <summary>
     /// 任务标记。
@@ -162,7 +164,7 @@ namespace GameLib.Network
             while (taskInfo.IsRunning)
             {
                 _sender.Broadcast();
-                await Task.Delay((int)(BroadcastInterval*TimeScalar.MillisecondsPerSecond));
+                await Task.Delay((int)(BroadcastInterval*TimeExtension.MillisecondsPerSecond));
             }
         }
 

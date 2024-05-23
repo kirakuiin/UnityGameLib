@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameLib.Common
+namespace GameLib.Common.Utility
 {
     /// <summary>
     /// 某些对象要以低于<c>MonoBehaviour</c>Update速度来进行更新，比如说数据库的数据更新等。
@@ -120,7 +120,5 @@ namespace GameLib.Common
                 _pendingHandler.Dequeue()?.Invoke();
             }
         }
-        
-        
     }
 }

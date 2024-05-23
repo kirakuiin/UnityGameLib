@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace GameLib.Common
+namespace GameLib.Common.Pattern
 {
     /// <summary>
     /// 实现单例模式必须实现的接口

@@ -1,6 +1,6 @@
-namespace GameLib.Common
+namespace GameLib.Common.Extension
 {
-    public static class TimeScalar
+    public static class TimeExtension
     {
         /// <summary>
         /// 每秒包含多少毫秒

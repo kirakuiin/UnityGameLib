@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GameLib.Common;
 using GameLib.Common.Extension;
+using GameLib.Common.Pattern;
 using GameLib.Network;
 using UnityEngine;
 using GameLib.Network.NGO.Channel;

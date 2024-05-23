@@ -1,9 +1,9 @@
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
-using GameLib.Common;
+using GameLib.Common.Extension;
 
-namespace GameLib.Network.Analysis
+namespace GameLib.Network.Utility
 {
     /// <summary>
     /// 获得到目标主机的延迟信息
@@ -43,7 +43,7 @@ namespace GameLib.Network.Analysis
         {
             var ipList = await Dns.GetHostAddressesAsync(_targetAddress);
             if (ipList.Length == 0) return NetworkStatus.CreateUnreachableStatus(_targetAddress);
-            var reply = await _sender.SendPingAsync(ipList[0], TimeScalar.ConvertSecondToMs(_timeout));
+            var reply = await _sender.SendPingAsync(ipList[0], TimeExtension.ConvertSecondToMs(_timeout));
             return new NetworkStatus(reply);
         }
 

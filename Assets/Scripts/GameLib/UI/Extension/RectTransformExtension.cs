@@ -5,7 +5,7 @@ namespace GameLib.UI.Extension
     public static class RectTransformExtension
     {
         /// <summary>
-        /// 设置矩形变化的大小。
+        /// 设置矩形变换的大小。
         /// </summary>
         /// <param name="rectTransform"></param>
         /// <param name="size"></param>

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using GameLib.Common.Pattern;
 using UnityEngine;
 using UnityEngine.Pool;
 
-namespace GameLib.Common
+namespace GameLib.Common.Utility
 {
     /// <summary>
     /// 游戏对象池，将不用的游戏对象缓存起来。

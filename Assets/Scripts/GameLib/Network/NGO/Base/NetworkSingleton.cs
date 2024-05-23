@@ -1,4 +1,4 @@
-﻿using GameLib.Common;
+﻿using GameLib.Common.Pattern;
 using Unity.Netcode;
 using UnityEngine;
 

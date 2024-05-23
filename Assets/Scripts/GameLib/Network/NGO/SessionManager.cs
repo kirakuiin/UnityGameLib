@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using GameLib.Common;
 using UnityEngine;
 using System.Linq;
+using GameLib.Common.Pattern;
 
 namespace GameLib.Network.NGO
 {
